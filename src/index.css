@@ -1,0 +1,255 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Libre+Franklin:wght@200;300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Psychologist Website Color Palette */
+    --background: 30 24% 96%; /* #F7F4F2 */
+    --foreground: 0 0% 17%; /* #2B2B2B */
+    --card: 30 24% 98%;
+    --card-foreground: 0 0% 17%;
+    --popover: 30 24% 98%;
+    --popover-foreground: 0 0% 17%;
+    --primary: 22 35% 74%; /* #D8B4A0 */
+    --primary-foreground: 0 0% 17%;
+    --secondary: 78 18% 62%; /* #A3B18A */
+    --secondary-foreground: 0 0% 17%;
+    --muted: 30 15% 92%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 22 35% 74%; /* #D8B4A0 */
+    --accent-foreground: 0 0% 17%;
+    --destructive: 0 70% 64%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 30 15% 88%;
+    --input: 30 15% 88%;
+    --ring: 22 35% 74%;
+    --radius: 16px;
+    
+    /* Custom Colors */
+    --psy-bg: #F7F4F2;
+    --psy-accent: #D8B4A0;
+    --psy-secondary: #A3B18A;
+    --psy-text: #2B2B2B;
+    --psy-text-light: #5A5A5A;
+    --psy-white: #FFFFFF;
+    --psy-cream: #FAF8F6;
+    
+    --font-serif: 'DM Serif Display', serif;
+    --font-sans: 'Libre Franklin', sans-serif;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    font-weight: 300;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--psy-bg);
+    color: var(--psy-text);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--psy-text);
+  }
+  
+  h1 {
+    font-size: clamp(2rem, 4vw, 3rem);
+  }
+  
+  h2 {
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  }
+  
+  h3 {
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  }
+  
+  h4 {
+    font-size: 1.125rem;
+  }
+  
+  p {
+    font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--psy-text-light);
+  }
+}
+
+@layer utilities {
+  .font-serif {
+    font-family: var(--font-serif);
+  }
+  
+  .font-sans {
+    font-family: var(--font-sans);
+  }
+  
+  .text-psy-accent {
+    color: var(--psy-accent);
+  }
+  
+  .text-psy-secondary {
+    color: var(--psy-secondary);
+  }
+  
+  .bg-psy-bg {
+    background-color: var(--psy-bg);
+  }
+  
+  .bg-psy-accent {
+    background-color: var(--psy-accent);
+  }
+  
+  .bg-psy-secondary {
+    background-color: var(--psy-secondary);
+  }
+  
+  .bg-psy-cream {
+    background-color: var(--psy-cream);
+  }
+  
+  .parallax-bg {
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+  }
+  
+  @media (max-width: 768px) {
+    .parallax-bg {
+      background-attachment: scroll;
+    }
+  }
+  
+  /* Soft rounded corners */
+  .rounded-soft {
+    border-radius: 20px;
+  }
+  
+  .rounded-softer {
+    border-radius: 24px;
+  }
+  
+  /* Gentle shadows */
+  .shadow-soft {
+    box-shadow: 0 4px 20px rgba(43, 43, 43, 0.06);
+  }
+  
+  .shadow-softer {
+    box-shadow: 0 8px 30px rgba(43, 43, 43, 0.08);
+  }
+  
+  /* Animation utilities */
+  .animate-fade-up {
+    animation: fadeUp 0.8s ease forwards;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease forwards;
+  }
+  
+  .animate-slide-left {
+    animation: slideLeft 0.8s ease forwards;
+  }
+  
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  /* Card hover effects */
+  .card-hover {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .card-hover:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(43, 43, 43, 0.1);
+  }
+  
+  /* Button hover */
+  .btn-hover {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .btn-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(216, 180, 160, 0.35);
+  }
+  
+  /* Image scale */
+  .image-scale {
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  }
+  
+  .image-scale:hover img {
+    transform: scale(1.05);
+  }
+  
+  .image-scale img {
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Scrollbar hide */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Gradient backgrounds */
+  .gradient-soft {
+    background: linear-gradient(135deg, var(--psy-bg) 0%, var(--psy-cream) 100%);
+  }
+  
+  .gradient-accent {
+    background: linear-gradient(135deg, var(--psy-accent) 0%, #E8C4B0 100%);
+  }
+}
