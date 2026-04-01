@@ -4,6 +4,7 @@ import { MessageCircle, Send } from 'lucide-react';
 const PsyHero = () => {
   const whatsappLink = "https://wa.me/?text=Здравствуйте, хочу записаться на консультацию";
   const telegramLink = "https://t.me/";
+  const baseUrl = import.meta.env.BASE_URL;
 
   return (
     <section className="min-h-screen w-full flex items-center bg-[#F7F4F2] pt-20 pb-16 px-4 sm:px-6 lg:px-8 xl:px-12">
@@ -85,7 +86,7 @@ const PsyHero = () => {
                 className="relative overflow-hidden rounded-[1.5rem] shadow-softer"
               >
                 <img
-                  src="/images/trust.jpeg"
+                  src={`${baseUrl}images/trust.jpeg`}
                   alt="Леся Афанасьева — консультирующий психолог"
                   className="w-full max-w-md lg:max-w-lg h-[28rem] sm:h-[32rem] object-cover object-[center_20%]"
                 />

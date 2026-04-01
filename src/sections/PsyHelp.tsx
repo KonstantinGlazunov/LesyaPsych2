@@ -8,7 +8,7 @@ const transformations = [
     id: 1,
     before: 'Постоянная тревога и беспокойство',
     after: 'Внутреннее спокойствие и ясность',
-    image: '/images/image_b87f5b.jpg',
+    image: 'images/image_b87f5b.jpg',
     imageClass: 'object-[center_20%] scale-110',
     imageHoverClass: 'group-hover:scale-[1.15]'
   },
@@ -16,25 +16,26 @@ const transformations = [
     id: 2,
     before: 'Ощущение потери себя и растерянность',
     after: 'Ощущение целостности и направления',
-    image: '/images/relax.jpeg'
+    image: 'images/relax.jpeg'
   },
   {
     id: 3,
     before: 'Переполненность эмоциями',
     after: 'Эмоциональная устойчивость и баланс',
-    image: '/images/konflikt.jpeg'
+    image: 'images/konflikt.jpeg'
   },
   {
     id: 4,
     before: 'Сложности с принятием решений',
     after: 'Уверенность в своих выборах',
-    image: '/images/doit.jpeg'
+    image: 'images/doit.jpeg'
   }
 ];
 
 const PsyHelp = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const baseUrl = import.meta.env.BASE_URL;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -92,9 +93,9 @@ const PsyHelp = () => {
             >
               <div className="grid grid-cols-1 sm:grid-cols-2">
                 {/* Image */}
-                <div className="h-56 sm:h-full overflow-hidden">
+                <div className="self-stretch overflow-hidden">
                   <img
-                    src={item.image}
+                    src={`${baseUrl}${item.image}`}
                     alt={item.after}
                     className={`w-full h-full object-cover transition-transform duration-500 ${item.imageHoverClass ?? 'group-hover:scale-105'} ${item.imageClass ?? ''}`}
                   />

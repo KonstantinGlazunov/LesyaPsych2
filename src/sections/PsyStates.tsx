@@ -9,41 +9,42 @@ const states = [
     title: 'Тревожность',
     description: 'Постоянное беспокойство, внутреннее напряжение, ощущение, что всё выходит из-под контроля.',
     icon: Brain,
-    image: '/images/window.jpeg'
+    image: 'images/window.jpeg'
   },
   {
     id: 2,
     title: 'Потеря себя',
     description: 'Ощущение оторванности от себя настоящего, своих ценностей и смыслов.',
     icon: UserX,
-    image: '/images/window2.jpeg'
+    image: 'images/window2.jpeg'
   },
   {
     id: 3,
     title: 'Сложности с выбором',
     description: 'Паралич перед принятием решений, страх ошибиться, постоянные сомнения.',
     icon: GitBranch,
-    image: '/images/sad.jpeg'
+    image: 'images/sad.jpeg'
   },
   {
     id: 4,
     title: 'Эмоциональная перегрузка',
     description: 'Когда эмоций слишком много, и не получается ни понять их, ни выразить.',
     icon: Zap,
-    image: '/images/konflikt.jpeg'
+    image: 'images/konflikt.jpeg'
   },
   {
     id: 5,
     title: 'Пустота',
     description: 'Ощущение внутренней пустоты, отсутствие мотивации, неспособность радоваться.',
     icon: CircleDot,
-    image: '/images/body.jpeg'
+    image: 'images/body.jpeg'
   }
 ];
 
 const PsyStates = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const baseUrl = import.meta.env.BASE_URL;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -104,7 +105,7 @@ const PsyStates = () => {
                 {/* Image */}
                 <div className="h-40 overflow-hidden">
                   <img
-                    src={state.image}
+                    src={`${baseUrl}${state.image}`}
                     alt={state.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />

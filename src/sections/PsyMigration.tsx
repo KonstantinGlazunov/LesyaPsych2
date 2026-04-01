@@ -27,6 +27,7 @@ const challenges = [
 ];
 
 const PsyMigration = () => {
+  const baseUrl = import.meta.env.BASE_URL;
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
@@ -111,7 +112,7 @@ const PsyMigration = () => {
               className="relative overflow-hidden rounded-[1.5rem] shadow-softer"
             >
               <img
-                src="/images/kolage.jpeg"
+                src={`${baseUrl}images/kolage.jpeg`}
                 alt="Баланс и гармония"
                 className="w-full h-auto object-cover"
               />

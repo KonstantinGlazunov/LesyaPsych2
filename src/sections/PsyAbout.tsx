@@ -6,6 +6,7 @@ import { Award, Heart, Sparkles } from 'lucide-react';
 const PsyAbout = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const baseUrl = import.meta.env.BASE_URL;
 
   const credentials = [
     { icon: Award, text: 'Сертифицированный консультирующий психолог' },
@@ -31,7 +32,7 @@ const PsyAbout = () => {
               className="relative overflow-hidden rounded-[1.5rem] shadow-softer"
             >
               <img
-                src="/images/understanding.jpeg"
+                src={`${baseUrl}images/understanding.jpeg`}
                 alt="Леся Афанасьева на консультации"
                 className="w-full h-auto object-cover"
               />

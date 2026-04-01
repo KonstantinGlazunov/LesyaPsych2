@@ -5,6 +5,7 @@ import { useRef } from 'react';
 const PsyVideo = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const baseUrl = import.meta.env.BASE_URL;
 
   return (
     <section ref={ref} className="w-full py-20 lg:py-28 bg-[#FAF8F6] px-4 sm:px-6 lg:px-8 xl:px-12">
@@ -34,9 +35,9 @@ const PsyVideo = () => {
               className="absolute inset-0 h-full w-full object-cover"
               controls
               preload="metadata"
-              poster="/images/trust.jpeg"
+              poster={`${baseUrl}images/trust.jpeg`}
             >
-              <source src="/images/presentation.mp4" type="video/mp4" />
+              <source src={`${baseUrl}images/presentation.mp4`} type="video/mp4" />
               Ваш браузер не поддерживает воспроизведение видео.
             </video>
           </div>
