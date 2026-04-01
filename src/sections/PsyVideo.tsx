@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
-import { Play } from 'lucide-react';
 
 const PsyVideo = () => {
   const ref = useRef(null);
@@ -31,23 +30,15 @@ const PsyVideo = () => {
           className="relative"
         >
           <div className="relative overflow-hidden rounded-[1.5rem] shadow-softer bg-[#2B2B2B] aspect-video">
-            {/* Video Placeholder */}
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#2B2B2B] to-[#3D3D3D]">
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#D8B4A0] flex items-center justify-center shadow-lg btn-hover"
-              >
-                <Play className="w-8 h-8 sm:w-10 sm:h-10 text-white ml-1" fill="white" />
-              </motion.button>
-            </div>
-            
-            {/* Overlay text */}
-            <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 bg-gradient-to-t from-black/60 to-transparent">
-              <p className="text-white/80 text-sm sm:text-base">
-                Нажмите, чтобы посмотреть вводное видео
-              </p>
-            </div>
+            <video
+              className="absolute inset-0 h-full w-full object-cover"
+              controls
+              preload="metadata"
+              poster="/images/trust.jpeg"
+            >
+              <source src="/images/presentation.mp4" type="video/mp4" />
+              Ваш браузер не поддерживает воспроизведение видео.
+            </video>
           </div>
         </motion.div>
       </div>

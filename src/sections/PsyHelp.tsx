@@ -8,7 +8,9 @@ const transformations = [
     id: 1,
     before: 'Постоянная тревога и беспокойство',
     after: 'Внутреннее спокойствие и ясность',
-    image: '/images/understanding.jpeg'
+    image: '/images/image_b87f5b.jpg',
+    imageClass: 'object-[center_20%] scale-110',
+    imageHoverClass: 'group-hover:scale-[1.15]'
   },
   {
     id: 2,
@@ -20,7 +22,7 @@ const transformations = [
     id: 3,
     before: 'Переполненность эмоциями',
     after: 'Эмоциональная устойчивость и баланс',
-    image: '/images/happy.jpeg'
+    image: '/images/konflikt.jpeg'
   },
   {
     id: 4,
@@ -90,11 +92,11 @@ const PsyHelp = () => {
             >
               <div className="grid grid-cols-1 sm:grid-cols-2">
                 {/* Image */}
-                <div className="h-48 sm:h-full overflow-hidden">
+                <div className="h-56 sm:h-full overflow-hidden">
                   <img
                     src={item.image}
                     alt={item.after}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className={`w-full h-full object-cover transition-transform duration-500 ${item.imageHoverClass ?? 'group-hover:scale-105'} ${item.imageClass ?? ''}`}
                   />
                 </div>
                 

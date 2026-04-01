@@ -31,7 +31,7 @@ const PsyAbout = () => {
               className="relative overflow-hidden rounded-[1.5rem] shadow-softer"
             >
               <img
-                src="/images/trust.jpeg"
+                src="/images/understanding.jpeg"
                 alt="Леся Афанасьева на консультации"
                 className="w-full h-auto object-cover"
               />

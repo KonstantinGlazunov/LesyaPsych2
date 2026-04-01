@@ -85,9 +85,9 @@ const PsyHero = () => {
                 className="relative overflow-hidden rounded-[1.5rem] shadow-softer"
               >
                 <img
-                  src="/images/lesya.jpeg"
+                  src="/images/trust.jpeg"
                   alt="Леся Афанасьева — консультирующий психолог"
-                  className="w-full max-w-md lg:max-w-lg h-auto object-cover"
+                  className="w-full max-w-md lg:max-w-lg h-[28rem] sm:h-[32rem] object-cover object-[center_20%]"
                 />
               </motion.div>
             </div>
