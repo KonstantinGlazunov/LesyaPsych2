@@ -1,12 +1,11 @@
 import { motion } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
+import { WHATSAPP_LINK } from '../lib/contact';
 
 const WhatsAppButton = () => {
-  const whatsappLink = "https://wa.me/?text=Здравствуйте, хочу записаться на консультацию";
-
   return (
     <motion.a
-      href={whatsappLink}
+      href={WHATSAPP_LINK}
       target="_blank"
       rel="noopener noreferrer"
       initial={{ opacity: 0, scale: 0.8 }}
@@ -15,7 +14,8 @@ const WhatsAppButton = () => {
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
       className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow"
-      aria-label="Написать в WhatsApp"
+      aria-label="Написать в WhatsApp (или отправить голосовое сообщение)"
+      title="Mit Klick öffnet sich WhatsApp in einem externen Dienst"
     >
       <MessageCircle className="w-7 h-7 text-white" fill="white" />
       

@@ -1,16 +1,23 @@
-import { Heart, MessageCircle, Send, Mail } from 'lucide-react';
+import { Heart, MessageCircle, Send, Mail, MapPin } from 'lucide-react';
+import {
+  CONTACT_ADDRESS,
+  CONTACT_EMAIL,
+  CONTACT_NAME,
+  CONTACT_PHONE_DISPLAY,
+  TELEGRAM_LINK,
+  WHATSAPP_LINK,
+  getHomeHref,
+  getLegalHref,
+} from '../lib/contact';
 
 const PsyFooter = () => {
-  const whatsappLink = "https://wa.me/?text=Здравствуйте, хочу записаться на консультацию";
-  const telegramLink = "https://t.me/";
-
   return (
     <footer className="w-full bg-[#2B2B2B] text-white py-12 px-4 sm:px-6 lg:px-8 xl:px-12">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
           {/* Brand */}
           <div>
-            <h3 className="text-xl font-serif mb-4">Леся Афанасьева</h3>
+            <h3 className="text-xl font-serif mb-4">{CONTACT_NAME}</h3>
             <p className="text-white/60 text-sm leading-relaxed mb-4">
               Консультирующий психолог. Помогаю разобраться в себе, снизить тревожность и восстановить внутреннюю опору.
             </p>
@@ -21,10 +28,10 @@ const PsyFooter = () => {
           
           {/* Contact */}
           <div>
-            <h4 className="text-sm uppercase tracking-wider text-white/60 mb-4">Контакты</h4>
+            <h4 className="text-sm uppercase tracking-wider text-white/60 mb-4">Kontakt</h4>
             <div className="space-y-3">
               <a
-                href={whatsappLink}
+                href={WHATSAPP_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 text-white/80 hover:text-white transition-colors"
@@ -33,7 +40,7 @@ const PsyFooter = () => {
                 <span className="text-sm">WhatsApp</span>
               </a>
               <a
-                href={telegramLink}
+                href={TELEGRAM_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 text-white/80 hover:text-white transition-colors"
@@ -41,10 +48,21 @@ const PsyFooter = () => {
                 <Send className="w-5 h-5" />
                 <span className="text-sm">Telegram</span>
               </a>
-              <div className="flex items-center gap-3 text-white/60">
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="flex items-center gap-3 text-white/60 transition-colors hover:text-white"
+              >
                 <Mail className="w-5 h-5" />
-                <span className="text-sm">lesya@example.com</span>
+                <span className="text-sm">{CONTACT_EMAIL}</span>
+              </a>
+              <div className="flex items-start gap-3 text-white/60">
+                <MapPin className="mt-0.5 h-5 w-5" />
+                <span className="text-sm">{CONTACT_ADDRESS}</span>
               </div>
+              <p className="pt-1 text-xs text-white/40">
+                Mit Klick auf WhatsApp verlassen Sie diese Website. Es gelten dann die
+                Datenschutzbestimmungen des externen Anbieters.
+              </p>
             </div>
           </div>
           
@@ -52,17 +70,26 @@ const PsyFooter = () => {
           <div>
             <h4 className="text-sm uppercase tracking-wider text-white/60 mb-4">Навигация</h4>
             <div className="space-y-2">
-              <a href="#about" className="block text-white/80 hover:text-white transition-colors text-sm">
+              <a href={getHomeHref('#about')} className="block text-white/80 hover:text-white transition-colors text-sm">
                 Обо мне
               </a>
-              <a href="#states" className="block text-white/80 hover:text-white transition-colors text-sm">
+              <a href={getHomeHref('#states')} className="block text-white/80 hover:text-white transition-colors text-sm">
                 С чем работаю
               </a>
-              <a href="#process" className="block text-white/80 hover:text-white transition-colors text-sm">
+              <a href={getHomeHref('#process')} className="block text-white/80 hover:text-white transition-colors text-sm">
                 Как проходит консультация
               </a>
-              <a href="#cta" className="block text-white/80 hover:text-white transition-colors text-sm">
+              <a href={getHomeHref('#cta')} className="block text-white/80 hover:text-white transition-colors text-sm">
                 Связаться
+              </a>
+              <a href={getLegalHref('impressum')} className="block text-white/80 hover:text-white transition-colors text-sm">
+                Impressum
+              </a>
+              <a href={getLegalHref('datenschutz')} className="block text-white/80 hover:text-white transition-colors text-sm">
+                Datenschutzerklärung
+              </a>
+              <a href={getLegalHref('agb')} className="block text-white/80 hover:text-white transition-colors text-sm">
+                AGB
               </a>
             </div>
           </div>

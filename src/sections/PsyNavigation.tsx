@@ -51,9 +51,9 @@ const PsyNavigation = () => {
             <a
               href="#hero"
               onClick={(e) => handleLinkClick(e, '#hero')}
-              className="text-[#2B2B2B] font-serif text-lg lg:text-xl"
+              className="inline-flex w-max flex-col items-start text-[#2B2B2B] font-serif text-lg lg:text-xl leading-tight"
             >
-              Леся Афанасьева
+              <span className="w-max">Леся Афанасьева</span>
             </a>
 
             {/* Desktop Navigation */}
