@@ -38,7 +38,7 @@ const PsyCTA = () => {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="text-white text-2xl sm:text-3xl lg:text-4xl mb-4 max-w-2xl mx-auto"
             >
-              Если мой подход откликается — напишите мне
+              Если мой подход откликается — пишите мне
             </motion.h2>
             
             <motion.p
@@ -59,7 +59,7 @@ const PsyCTA = () => {
               <div className="text-sm sm:text-base font-medium text-white">
                 Написать или отправить голосовое сообщение
               </div>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <div className="flex flex-row flex-wrap gap-3 justify-center">
                 <a
                   href={WHATSAPP_LINK}
                   target="_blank"

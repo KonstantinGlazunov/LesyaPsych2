@@ -335,7 +335,7 @@ const PsyQuiz = () => {
                   <div className="text-sm sm:text-base font-medium text-[#2B2B2B]">
                     Написать или отправить голосовое сообщение
                   </div>
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <div className="flex flex-row flex-wrap gap-3 justify-center">
                     <a
                       href={WHATSAPP_LINK}
                       target="_blank"
