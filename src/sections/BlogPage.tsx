@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchBlogPosts } from '../lib/blog';
+import { fetchBlogPosts, getBlogPosts } from '../lib/blog';
 import type { BlogPost } from '../lib/blog';
 import { getHomeHref } from '../lib/contact';
 
@@ -9,8 +9,9 @@ type BlogPageProps = {
 
 const BlogPage = ({ postSlug }: BlogPageProps) => {
   const baseUrl = import.meta.env.BASE_URL;
-  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const cachedPosts = getBlogPosts();
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>(cachedPosts);
+  const [isLoading, setIsLoading] = useState(cachedPosts.length === 0);
 
   useEffect(() => {
     let isMounted = true;
@@ -33,6 +34,19 @@ const BlogPage = ({ postSlug }: BlogPageProps) => {
   const post = postSlug
     ? blogPosts.find((item) => item.slug === postSlug) ?? null
     : null;
+
+  if (postSlug && isLoading) {
+    return (
+      <section className="min-h-screen bg-[#F7F4F2] px-4 sm:px-6 lg:px-8 xl:px-12 py-20">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center gap-3 text-[#7A6B63]">
+            <span className="h-5 w-5 rounded-full border-2 border-[#D8B4A0] border-t-transparent animate-spin" />
+            Загружаем статью...
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (postSlug && !post && !isLoading) {
     return (
@@ -146,7 +160,10 @@ const BlogPage = ({ postSlug }: BlogPageProps) => {
         </p>
 
         {isLoading ? (
-          <div className="text-[#7A6B63]">Загружаем статьи...</div>
+          <div className="flex items-center gap-3 text-[#7A6B63]">
+            <span className="h-5 w-5 rounded-full border-2 border-[#D8B4A0] border-t-transparent animate-spin" />
+            Загружаем статьи...
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {blogPosts.map((item) => (

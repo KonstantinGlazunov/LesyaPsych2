@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
-import { BLOG_SHEETS_ENDPOINT, fetchBlogPosts, upsertBlogPost } from '../lib/blog';
+import {
+  BLOG_SHEETS_ENDPOINT,
+  fetchBlogPosts,
+  getBlogPosts,
+  upsertBlogPost,
+} from '../lib/blog';
 import type { BlogPost } from '../lib/blog';
 import { getHomeHref } from '../lib/contact';
 
@@ -19,8 +24,10 @@ const calculateReadingTime = (text: string) => {
 };
 
 const BlogAdmin = () => {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const cachedPosts = getBlogPosts();
+  const [posts, setPosts] = useState<BlogPost[]>(cachedPosts);
+  const [isLoading, setIsLoading] = useState(cachedPosts.length === 0);
+  const [isSaving, setIsSaving] = useState(false);
   const [selectedSlug, setSelectedSlug] = useState<string>('');
   const [draft, setDraft] = useState<BlogPost>(() => createEmptyPost());
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
@@ -85,6 +92,7 @@ const BlogAdmin = () => {
       date: draft.date || new Date().toLocaleDateString('ru-RU'),
     };
     try {
+      setIsSaving(true);
       const nextPosts = await upsertBlogPost(normalized);
       setPosts(nextPosts);
       setSelectedSlug(normalized.slug);
@@ -92,6 +100,8 @@ const BlogAdmin = () => {
     } catch (error) {
       console.error(error);
       alert('Не удалось сохранить статью.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -128,7 +138,12 @@ const BlogAdmin = () => {
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
           <aside className="bg-white rounded-[1.5rem] p-6 shadow-soft">
             <div className="text-sm text-[#7A6B63] mb-3">Выбор статьи</div>
-            {isLoading && <div className="text-xs text-[#7A6B63] mb-2">Загрузка...</div>}
+            {isLoading && (
+              <div className="flex items-center gap-2 text-xs text-[#7A6B63] mb-2">
+                <span className="inline-flex h-4 w-4 rounded-full border-2 border-[#D8B4A0] border-t-transparent animate-spin" />
+                Загрузка...
+              </div>
+            )}
             <select
               value={selectedSlug}
               onChange={(event) => handleSelect(event.target.value)}
@@ -149,7 +164,12 @@ const BlogAdmin = () => {
             </button>
           </aside>
 
-          <div className="bg-white rounded-[1.5rem] p-6 sm:p-8 shadow-soft space-y-6">
+          <div className="bg-white rounded-[1.5rem] p-6 sm:p-8 shadow-soft space-y-6 relative">
+            {isSaving && (
+              <div className="absolute inset-0 bg-white/70 rounded-[1.5rem] flex items-center justify-center">
+                <span className="h-10 w-10 rounded-full border-4 border-[#D8B4A0] border-t-transparent animate-spin" />
+              </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <label className="space-y-2 text-sm text-[#7A6B63]">
                 Заголовок статьи
@@ -209,9 +229,10 @@ const BlogAdmin = () => {
 
             <button
               onClick={handleSave}
-              className="inline-flex items-center justify-center rounded-full bg-[#2B2B2B] text-white px-6 py-3 hover:bg-[#1F1F1F] transition-colors"
+              disabled={isSaving}
+              className="inline-flex items-center justify-center rounded-full bg-[#2B2B2B] text-white px-6 py-3 hover:bg-[#1F1F1F] transition-colors disabled:opacity-60"
             >
-              Сохранить статью
+              {isSaving ? 'Сохраняем...' : 'Сохранить статью'}
             </button>
           </div>
         </div>
