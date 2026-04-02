@@ -13,6 +13,9 @@ import PsyFooter from './sections/PsyFooter';
 import WhatsAppButton from './components/WhatsAppButton';
 import LegalPage from './sections/LegalPage';
 import type { LegalPageKey } from './lib/contact';
+import BlogPage from './sections/BlogPage';
+import { getPostBySlug } from './lib/blog';
+import BlogAdmin from './sections/BlogAdmin';
 
 const getLegalPageFromUrl = (): LegalPageKey | null => {
   const page = new URLSearchParams(window.location.search).get('page');
@@ -26,18 +29,56 @@ const getLegalPageFromUrl = (): LegalPageKey | null => {
 
 function App() {
   const legalPage = useMemo(() => getLegalPageFromUrl(), []);
+  const blogParams = useMemo(() => new URLSearchParams(window.location.search), []);
+  const isBlogPage = blogParams.get('page') === 'blog';
+  const isAdminPage = blogParams.get('page') === 'admin';
+  const blogSlug = blogParams.get('post');
 
   useEffect(() => {
-    document.documentElement.lang = legalPage ? 'de' : 'ru';
-    document.title = legalPage
-      ? `${legalPage === 'agb' ? 'AGB' : legalPage === 'datenschutz' ? 'Datenschutzerklärung' : 'Impressum'} | Леся Афанасьева`
-      : 'Леся Афанасьева';
-  }, [legalPage]);
+    const isLegal = Boolean(legalPage);
+    document.documentElement.lang = isLegal ? 'de' : 'ru';
+
+    if (isLegal) {
+      document.title = `${legalPage === 'agb' ? 'AGB' : legalPage === 'datenschutz' ? 'Datenschutzerklärung' : 'Impressum'} | Леся Афанасьева`;
+      return;
+    }
+
+    if (isBlogPage) {
+      const post = blogSlug ? getPostBySlug(blogSlug) : null;
+      document.title = post ? `${post.title} | Блог` : 'Блог | Леся Афанасьева';
+      return;
+    }
+
+    if (isAdminPage) {
+      document.title = 'Админка блога | Леся Афанасьева';
+      return;
+    }
+
+    document.title = 'Леся Афанасьева';
+  }, [legalPage, isBlogPage, blogSlug]);
 
   if (legalPage) {
     return (
       <>
         <LegalPage page={legalPage} />
+        <PsyFooter />
+      </>
+    );
+  }
+
+  if (isBlogPage) {
+    return (
+      <>
+        <BlogPage postSlug={blogSlug ?? undefined} />
+        <PsyFooter />
+      </>
+    );
+  }
+
+  if (isAdminPage) {
+    return (
+      <>
+        <BlogAdmin />
         <PsyFooter />
       </>
     );

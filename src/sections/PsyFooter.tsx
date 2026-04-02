@@ -96,13 +96,24 @@ const PsyFooter = () => {
         
         {/* Divider */}
         <div className="border-t border-white/10 pt-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-white/40 text-xs">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-white/40 text-xs text-center sm:text-left">
+            <p>
               © {new Date().getFullYear()} Леся Афанасьева. Все права защищены.
             </p>
-            <p className="text-white/40 text-xs flex items-center gap-1">
-              Сделано с <Heart className="w-3 h-3 text-[#D8B4A0]" fill="#D8B4A0" /> для вашего благополучия
-            </p>
+            <a
+              href={`${getHomeHref()}?page=admin`}
+              className="text-white/40 hover:text-white/70 transition-colors"
+            >
+              администратору
+            </a>
+            <a
+              href="https://erstellen-websiten.de"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-white/40 hover:text-white/70 transition-colors"
+            >
+              Сделано с <Heart className="w-3 h-3 text-[#D8B4A0]" fill="#D8B4A0" /> erstellen-websiten.de
+            </a>
           </div>
         </div>
       </div>

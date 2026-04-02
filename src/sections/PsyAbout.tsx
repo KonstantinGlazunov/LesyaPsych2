@@ -9,9 +9,10 @@ const PsyAbout = () => {
   const baseUrl = import.meta.env.BASE_URL;
 
   const credentials = [
-    { icon: Award, text: 'Сертифицированный консультирующий психолог' },
+    { icon: Award, text: 'Психолог-консультант' },
+    { icon: Award, text: 'Завершаю профильное обучение и продолжаю повышение квалификации' },
     { icon: Heart, text: 'Специализация: тревожность и жизненные переходы' },
-    { icon: Sparkles, text: 'Более 5 лет практики' }
+    { icon: Sparkles, text: 'Более 2 лет практики' }
   ];
 
   return (
@@ -45,7 +46,7 @@ const PsyAbout = () => {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="absolute -bottom-6 -right-6 bg-white rounded-[1rem] shadow-soft p-4 sm:p-5"
             >
-              <p className="text-[#D8B4A0] text-3xl sm:text-4xl font-serif">5+</p>
+              <p className="text-[#D8B4A0] text-3xl sm:text-4xl font-serif">2+</p>
               <p className="text-[#5A5A5A] text-sm">лет практики</p>
             </motion.div>
           </motion.div>

@@ -7,12 +7,14 @@ const navLinks = [
   { label: 'Обо мне', href: '#about' },
   { label: 'С чем работаю', href: '#states' },
   { label: 'Как проходит консультация', href: '#process' },
-  { label: 'Контакты', href: '#cta' }
+  { label: 'Контакты', href: '#cta' },
+  { label: 'Блог', href: '?page=blog', external: true },
 ];
 
 const PsyNavigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const baseUrl = import.meta.env.BASE_URL;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -51,9 +53,14 @@ const PsyNavigation = () => {
             <a
               href="#hero"
               onClick={(e) => handleLinkClick(e, '#hero')}
-              className="inline-flex w-max flex-col items-start text-[#2B2B2B] font-serif text-lg lg:text-xl leading-tight"
+              className="inline-flex items-center gap-3 text-[#2B2B2B] font-serif text-lg lg:text-xl leading-tight"
             >
-              <span className="w-max">Леся Афанасьева</span>
+              <img
+                src={`${baseUrl}images/lesyLogo.png`}
+                alt="Логотип Леси Афанасьевой"
+                className="h-10 w-auto"
+              />
+              <span>Леся Афанасьева</span>
             </a>
 
             {/* Desktop Navigation */}
@@ -62,7 +69,7 @@ const PsyNavigation = () => {
                 <a
                   key={link.href}
                   href={link.href}
-                  onClick={(e) => handleLinkClick(e, link.href)}
+                  onClick={link.external ? undefined : (e) => handleLinkClick(e, link.href)}
                   className="text-[#5A5A5A] hover:text-[#2B2B2B] transition-colors text-sm"
                 >
                   {link.label}
@@ -115,7 +122,7 @@ const PsyNavigation = () => {
                   <motion.a
                     key={link.href}
                     href={link.href}
-                    onClick={(e) => handleLinkClick(e, link.href)}
+                    onClick={link.external ? undefined : (e) => handleLinkClick(e, link.href)}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.1 }}
