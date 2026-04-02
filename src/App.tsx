@@ -32,6 +32,7 @@ function App() {
   const blogParams = useMemo(() => new URLSearchParams(window.location.search), []);
   const isBlogPage = blogParams.get('page') === 'blog';
   const isAdminPage = blogParams.get('page') === 'admin';
+  const shouldOpenQuiz = blogParams.get('quiz') === '1';
   const blogSlug = blogParams.get('post');
 
   useEffect(() => {
@@ -98,7 +99,7 @@ function App() {
           <PsyStates />
         </section>
         <section id="quiz">
-          <PsyQuiz />
+          <PsyQuiz autoOpen={shouldOpenQuiz} />
         </section>
         <section id="about">
           <PsyAbout />

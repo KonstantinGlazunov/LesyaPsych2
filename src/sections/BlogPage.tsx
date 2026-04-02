@@ -78,6 +78,27 @@ const BlogPage = ({ postSlug }: BlogPageProps) => {
               </p>
             ))}
           </div>
+
+          <div className="mt-12">
+            <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#D8B4A0] to-[#C9A08C] p-6 sm:p-8 lg:p-10">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute bottom-0 left-0 w-40 h-40 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2" />
+              <div className="relative z-10 text-center">
+                <h3 className="text-white text-xl sm:text-2xl mb-3">
+                  Не уверены, что с вами происходит?
+                </h3>
+                <p className="text-white/80 text-sm sm:text-base mb-6">
+                  Пройдите короткую диагностику (2 минуты), чтобы лучше понять своё состояние
+                </p>
+                <a
+                  href={`${getHomeHref()}?quiz=1#quiz`}
+                  className="inline-flex items-center justify-center rounded-full bg-white text-[#2B2B2B] px-6 py-3 font-medium btn-hover"
+                >
+                  Пройти тест
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     );

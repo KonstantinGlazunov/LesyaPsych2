@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ClipboardCheck, ArrowRight } from 'lucide-react';
 import {
   Dialog,
@@ -162,7 +162,11 @@ const computeResultTag = (answers: QuizTag[]): QuizTag => {
   return tailLeaders.length === 1 ? tailLeaders[0] : 'mixed';
 };
 
-const PsyQuiz = () => {
+type PsyQuizProps = {
+  autoOpen?: boolean;
+};
+
+const PsyQuiz = ({ autoOpen }: PsyQuizProps) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [isOpen, setIsOpen] = useState(false);
@@ -191,6 +195,15 @@ const PsyQuiz = () => {
     resetQuiz();
     setStep('quiz');
   };
+
+  const hasAutoOpenedRef = useRef(false);
+  useEffect(() => {
+    if (autoOpen && !hasAutoOpenedRef.current) {
+      hasAutoOpenedRef.current = true;
+      setIsOpen(true);
+      setStep('intro');
+    }
+  }, [autoOpen]);
 
   const handleAnswer = (tag: QuizTag) => {
     const nextAnswers = [...answers, tag];
