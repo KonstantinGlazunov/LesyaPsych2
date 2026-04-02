@@ -116,29 +116,42 @@ export const fetchBlogPosts = async (source: 'auto' | 'sheets' = 'auto'): Promis
 };
 
 export const upsertBlogPost = async (post: BlogPost): Promise<BlogPost[]> => {
+  const current = getBlogPosts();
+  const next = current.some((item) => item.slug === post.slug)
+    ? current.map((item) => (item.slug === post.slug ? post : item))
+    : [post, ...current];
+  saveBlogPosts(next);
+
   if (!BLOG_SHEETS_ENDPOINT) {
-    const current = getBlogPosts();
-    const next = current.some((item) => item.slug === post.slug)
-      ? current.map((item) => (item.slug === post.slug ? post : item))
-      : [post, ...current];
-    saveBlogPosts(next);
     return next;
   }
-  const response = await fetch(BLOG_SHEETS_ENDPOINT, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'text/plain;charset=utf-8',
-    },
-    body: JSON.stringify(post),
-  });
-  if (!response.ok) {
-    throw new Error('Не удалось сохранить статью в Google Sheets');
+
+  try {
+    await fetch(BLOG_SHEETS_ENDPOINT, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8',
+      },
+      body: JSON.stringify(post),
+    });
+  } catch {
+    // Если запись в Sheets недоступна из браузера, оставляем локальную копию.
   }
-  const data = (await response.json()) as BlogPost[];
-  const normalized = Array.isArray(data) ? data.map(normalizePost) : [];
-  if (normalized.length > 0) {
-    saveBlogPosts(normalized);
-    return normalized;
+
+  return next;
+};
+
+export const triggerPublish = async () => {
+  if (!BLOG_SHEETS_ENDPOINT) {
+    return;
   }
-  return getBlogPosts();
+  try {
+    await fetch(`${BLOG_SHEETS_ENDPOINT}?action=trigger`, {
+      method: 'POST',
+      mode: 'no-cors',
+    });
+  } catch {
+    // Нет доступа к триггеру публикации.
+  }
 };

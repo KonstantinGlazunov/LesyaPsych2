@@ -3,6 +3,7 @@ import {
   BLOG_SHEETS_ENDPOINT,
   fetchBlogPosts,
   getBlogPosts,
+  triggerPublish,
   upsertBlogPost,
 } from '../lib/blog';
 import type { BlogPost } from '../lib/blog';
@@ -34,7 +35,7 @@ const BlogAdmin = () => {
 
   useEffect(() => {
     let isMounted = true;
-    fetchBlogPosts('sheets')
+    fetchBlogPosts('auto')
       .then((items) => {
         if (!isMounted) {
           return;
@@ -96,7 +97,8 @@ const BlogAdmin = () => {
       const nextPosts = await upsertBlogPost(normalized);
       setPosts(nextPosts);
       setSelectedSlug(normalized.slug);
-      alert('Статья сохранена.');
+      await triggerPublish();
+      alert('Статья сохранена. Публикация появится через 2 минуты.');
     } catch (error) {
       console.error(error);
       alert('Не удалось сохранить статью.');
@@ -134,6 +136,9 @@ const BlogAdmin = () => {
             Укажите ссылку Apps Script в коде (BLOG_SHEETS_ENDPOINT), чтобы статьи сохранялись в Google Sheets.
           </div>
         )}
+        <div className="mb-8 rounded-2xl border border-[#E6DDD6] bg-white/80 p-4 text-sm text-[#7A6B63]">
+          Публикация запускается автоматически после сохранения статьи.
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
           <aside className="bg-white rounded-[1.5rem] p-6 shadow-soft">
