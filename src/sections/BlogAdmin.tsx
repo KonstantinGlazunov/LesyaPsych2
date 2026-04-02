@@ -34,7 +34,7 @@ const BlogAdmin = () => {
 
   useEffect(() => {
     let isMounted = true;
-    fetchBlogPosts()
+    fetchBlogPosts('sheets')
       .then((items) => {
         if (!isMounted) {
           return;

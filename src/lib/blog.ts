@@ -9,6 +9,7 @@ export type BlogPost = {
 };
 
 export const BLOG_SHEETS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbylEL3g7Wyu5n4mNQzFSeuA3fTDK516epmumyklTzC9fUQwVeNYPIffDppJ_wSjWOCF/exec';
+const STATIC_BLOG_PATH = 'blog.json';
 
 const STORAGE_KEY = 'lesya_blog_posts';
 
@@ -79,25 +80,39 @@ const normalizePost = (post: BlogPost): BlogPost => ({
   content: post.content.trim(),
 });
 
-export const fetchBlogPosts = async (): Promise<BlogPost[]> => {
-  if (!BLOG_SHEETS_ENDPOINT) {
-    return getBlogPosts();
-  }
+const fetchFromEndpoint = async (url: string): Promise<BlogPost[] | null> => {
   try {
-    const response = await fetch(BLOG_SHEETS_ENDPOINT, { method: 'GET' });
+    const response = await fetch(url, { method: 'GET' });
     if (!response.ok) {
-      return getBlogPosts();
+      return null;
     }
     const data = (await response.json()) as BlogPost[];
     const normalized = Array.isArray(data) ? data.map(normalizePost) : [];
-    if (normalized.length > 0) {
-      saveBlogPosts(normalized);
-      return normalized;
-    }
-    return getBlogPosts();
+    return normalized.length > 0 ? normalized : null;
   } catch {
-    return getBlogPosts();
+    return null;
   }
+};
+
+export const fetchBlogPosts = async (source: 'auto' | 'sheets' = 'auto'): Promise<BlogPost[]> => {
+  if (typeof window !== 'undefined' && source === 'auto') {
+    const baseUrl = import.meta.env.BASE_URL ?? '/';
+    const staticPosts = await fetchFromEndpoint(`${baseUrl}${STATIC_BLOG_PATH}`);
+    if (staticPosts) {
+      saveBlogPosts(staticPosts);
+      return staticPosts;
+    }
+  }
+
+  if (BLOG_SHEETS_ENDPOINT) {
+    const sheetPosts = await fetchFromEndpoint(BLOG_SHEETS_ENDPOINT);
+    if (sheetPosts) {
+      saveBlogPosts(sheetPosts);
+      return sheetPosts;
+    }
+  }
+
+  return getBlogPosts();
 };
 
 export const upsertBlogPost = async (post: BlogPost): Promise<BlogPost[]> => {
