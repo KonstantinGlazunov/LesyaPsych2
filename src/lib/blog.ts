@@ -8,6 +8,8 @@ export type BlogPost = {
   content: string;
 };
 
+export const BLOG_SHEETS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbylEL3g7Wyu5n4mNQzFSeuA3fTDK516epmumyklTzC9fUQwVeNYPIffDppJ_wSjWOCF/exec';
+
 const STORAGE_KEY = 'lesya_blog_posts';
 
 const basePosts: BlogPost[] = [
@@ -65,3 +67,63 @@ export const saveBlogPosts = (posts: BlogPost[]) => {
 
 export const getPostBySlug = (slug: string) =>
   getBlogPosts().find((post) => post.slug === slug);
+
+const normalizePost = (post: BlogPost): BlogPost => ({
+  ...post,
+  slug: post.slug.trim(),
+  title: post.title.trim(),
+  excerpt: post.excerpt.trim(),
+  date: post.date.trim(),
+  readingTime: post.readingTime.trim(),
+  coverImage: post.coverImage?.trim(),
+  content: post.content.trim(),
+});
+
+export const fetchBlogPosts = async (): Promise<BlogPost[]> => {
+  if (!BLOG_SHEETS_ENDPOINT) {
+    return getBlogPosts();
+  }
+  try {
+    const response = await fetch(BLOG_SHEETS_ENDPOINT, { method: 'GET' });
+    if (!response.ok) {
+      return getBlogPosts();
+    }
+    const data = (await response.json()) as BlogPost[];
+    const normalized = Array.isArray(data) ? data.map(normalizePost) : [];
+    if (normalized.length > 0) {
+      saveBlogPosts(normalized);
+      return normalized;
+    }
+    return getBlogPosts();
+  } catch {
+    return getBlogPosts();
+  }
+};
+
+export const upsertBlogPost = async (post: BlogPost): Promise<BlogPost[]> => {
+  if (!BLOG_SHEETS_ENDPOINT) {
+    const current = getBlogPosts();
+    const next = current.some((item) => item.slug === post.slug)
+      ? current.map((item) => (item.slug === post.slug ? post : item))
+      : [post, ...current];
+    saveBlogPosts(next);
+    return next;
+  }
+  const response = await fetch(BLOG_SHEETS_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain;charset=utf-8',
+    },
+    body: JSON.stringify(post),
+  });
+  if (!response.ok) {
+    throw new Error('Не удалось сохранить статью в Google Sheets');
+  }
+  const data = (await response.json()) as BlogPost[];
+  const normalized = Array.isArray(data) ? data.map(normalizePost) : [];
+  if (normalized.length > 0) {
+    saveBlogPosts(normalized);
+    return normalized;
+  }
+  return getBlogPosts();
+};

@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { getBlogPosts, saveBlogPosts } from '../lib/blog';
+import { useEffect, useState } from 'react';
+import { BLOG_SHEETS_ENDPOINT, fetchBlogPosts, upsertBlogPost } from '../lib/blog';
 import type { BlogPost } from '../lib/blog';
 import { getHomeHref } from '../lib/contact';
 
@@ -19,14 +19,35 @@ const calculateReadingTime = (text: string) => {
 };
 
 const BlogAdmin = () => {
-  const initialPosts = useMemo(() => getBlogPosts(), []);
-  const [posts, setPosts] = useState<BlogPost[]>(initialPosts);
-  const [selectedSlug, setSelectedSlug] = useState<string>(initialPosts[0]?.slug ?? '');
-  const [draft, setDraft] = useState<BlogPost>(() => {
-    const existing = initialPosts.find((post) => post.slug === selectedSlug);
-    return existing ? { ...existing } : createEmptyPost();
-  });
-  const [previewUrl, setPreviewUrl] = useState<string | undefined>(draft.coverImage);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedSlug, setSelectedSlug] = useState<string>('');
+  const [draft, setDraft] = useState<BlogPost>(() => createEmptyPost());
+  const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchBlogPosts()
+      .then((items) => {
+        if (!isMounted) {
+          return;
+        }
+        setPosts(items);
+        if (items[0]) {
+          setSelectedSlug(items[0].slug);
+          setDraft({ ...items[0] });
+          setPreviewUrl(items[0].coverImage);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleSelect = (slug: string) => {
     setSelectedSlug(slug);
@@ -52,24 +73,26 @@ const BlogAdmin = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!draft.slug || !draft.title) {
       alert('Заполните адрес статьи и заголовок.');
       return;
     }
-    const normalized = {
+    const normalized: BlogPost = {
       ...draft,
       excerpt: draft.excerpt || draft.content.split(/\n+/).slice(0, 2).join(' ').slice(0, 180),
       readingTime: calculateReadingTime(draft.content),
       date: draft.date || new Date().toLocaleDateString('ru-RU'),
     };
-    const nextPosts = posts.some((post) => post.slug === normalized.slug)
-      ? posts.map((post) => (post.slug === normalized.slug ? normalized : post))
-      : [normalized, ...posts];
-    setPosts(nextPosts);
-    setSelectedSlug(normalized.slug);
-    saveBlogPosts(nextPosts);
-    alert('Статья сохранена.');
+    try {
+      const nextPosts = await upsertBlogPost(normalized);
+      setPosts(nextPosts);
+      setSelectedSlug(normalized.slug);
+      alert('Статья сохранена.');
+    } catch (error) {
+      console.error(error);
+      alert('Не удалось сохранить статью.');
+    }
   };
 
   const handleNew = () => {
@@ -93,12 +116,19 @@ const BlogAdmin = () => {
 
         <h1 className="text-3xl sm:text-4xl text-[#2B2B2B] mt-6 mb-4">Админка блога</h1>
         <p className="text-[#4B4B4B] mb-10 max-w-2xl">
-          Здесь можно создавать и редактировать статьи для SEO. Изменения сохраняются в браузере.
+          Здесь можно создавать и редактировать статьи для SEO. При подключении Apps Script данные
+          сохраняются в Google Sheets.
         </p>
+        {!BLOG_SHEETS_ENDPOINT && (
+          <div className="mb-8 rounded-2xl border border-[#E6DDD6] bg-white/80 p-4 text-sm text-[#7A6B63]">
+            Укажите ссылку Apps Script в коде (BLOG_SHEETS_ENDPOINT), чтобы статьи сохранялись в Google Sheets.
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
           <aside className="bg-white rounded-[1.5rem] p-6 shadow-soft">
             <div className="text-sm text-[#7A6B63] mb-3">Выбор статьи</div>
+            {isLoading && <div className="text-xs text-[#7A6B63] mb-2">Загрузка...</div>}
             <select
               value={selectedSlug}
               onChange={(event) => handleSelect(event.target.value)}

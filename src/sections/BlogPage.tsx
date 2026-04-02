@@ -1,4 +1,6 @@
-import { getBlogPosts, getPostBySlug } from '../lib/blog';
+import { useEffect, useState } from 'react';
+import { fetchBlogPosts } from '../lib/blog';
+import type { BlogPost } from '../lib/blog';
 import { getHomeHref } from '../lib/contact';
 
 type BlogPageProps = {
@@ -7,10 +9,32 @@ type BlogPageProps = {
 
 const BlogPage = ({ postSlug }: BlogPageProps) => {
   const baseUrl = import.meta.env.BASE_URL;
-  const post = postSlug ? getPostBySlug(postSlug) : null;
-  const blogPosts = getBlogPosts();
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  if (postSlug && !post) {
+  useEffect(() => {
+    let isMounted = true;
+    fetchBlogPosts()
+      .then((posts) => {
+        if (isMounted) {
+          setBlogPosts(posts);
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const post = postSlug
+    ? blogPosts.find((item) => item.slug === postSlug) ?? null
+    : null;
+
+  if (postSlug && !post && !isLoading) {
     return (
       <section className="min-h-screen bg-[#F7F4F2] px-4 sm:px-6 lg:px-8 xl:px-12 py-20">
         <div className="max-w-4xl mx-auto">
@@ -121,39 +145,43 @@ const BlogPage = ({ postSlug }: BlogPageProps) => {
           лучше понимать себя, снижать тревожность и находить внутреннюю опору.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {blogPosts.map((item) => (
-            <article
-              key={item.slug}
-              className="rounded-[1.5rem] bg-white shadow-soft overflow-hidden flex flex-col"
-            >
-              {item.coverImage && (
-                <img
-                  src={
-                    item.coverImage.startsWith('data:')
-                      ? item.coverImage
-                      : `${baseUrl}${item.coverImage}`
-                  }
-                  alt={item.title}
-                  className="h-52 w-full object-cover"
-                />
-              )}
-              <div className="p-6 flex flex-col gap-3">
-                <div className="text-xs text-[#7A6B63]">
-                  {item.date} · {item.readingTime}
+        {isLoading ? (
+          <div className="text-[#7A6B63]">Загружаем статьи...</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {blogPosts.map((item) => (
+              <article
+                key={item.slug}
+                className="rounded-[1.5rem] bg-white shadow-soft overflow-hidden flex flex-col"
+              >
+                {item.coverImage && (
+                  <img
+                    src={
+                      item.coverImage.startsWith('data:')
+                        ? item.coverImage
+                        : `${baseUrl}${item.coverImage}`
+                    }
+                    alt={item.title}
+                    className="h-52 w-full object-cover"
+                  />
+                )}
+                <div className="p-6 flex flex-col gap-3">
+                  <div className="text-xs text-[#7A6B63]">
+                    {item.date} · {item.readingTime}
+                  </div>
+                  <h2 className="text-xl text-[#2B2B2B] font-semibold">{item.title}</h2>
+                  <p className="text-[#4B4B4B] leading-relaxed">{item.excerpt}</p>
+                  <a
+                    href={`${getHomeHref()}?page=blog&post=${item.slug}`}
+                    className="inline-flex items-center text-sm font-medium text-[#2B2B2B] hover:text-[#1F1F1F]"
+                  >
+                    Читать статью →
+                  </a>
                 </div>
-                <h2 className="text-xl text-[#2B2B2B] font-semibold">{item.title}</h2>
-                <p className="text-[#4B4B4B] leading-relaxed">{item.excerpt}</p>
-                <a
-                  href={`${getHomeHref()}?page=blog&post=${item.slug}`}
-                  className="inline-flex items-center text-sm font-medium text-[#2B2B2B] hover:text-[#1F1F1F]"
-                >
-                  Читать статью →
-                </a>
-              </div>
-            </article>
-          ))}
-        </div>
+              </article>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
