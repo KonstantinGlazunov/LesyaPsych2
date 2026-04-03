@@ -12,6 +12,7 @@ export const BLOG_SHEETS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyl
 const STATIC_BLOG_PATH = 'blog.json';
 
 const STORAGE_KEY = 'lesya_blog_posts';
+const DELETED_KEY = 'lesya_blog_deleted';
 
 const basePosts: BlogPost[] = [
   {
@@ -54,9 +55,34 @@ const readStoredPosts = () => {
   }
 };
 
+const readDeletedSlugs = () => {
+  if (typeof window === 'undefined') {
+    return [];
+  }
+  try {
+    const raw = window.localStorage.getItem(DELETED_KEY);
+    if (!raw) {
+      return [];
+    }
+    const parsed = JSON.parse(raw) as string[];
+    return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveDeletedSlugs = (slugs: string[]) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  window.localStorage.setItem(DELETED_KEY, JSON.stringify(slugs));
+};
+
 export const getBlogPosts = () => {
+  const deleted = new Set(readDeletedSlugs());
   const stored = readStoredPosts();
-  return stored && stored.length > 0 ? stored : basePosts;
+  const source = stored && stored.length > 0 ? stored : basePosts;
+  return source.filter((post) => !deleted.has(post.slug));
 };
 
 export const saveBlogPosts = (posts: BlogPost[]) => {
@@ -94,10 +120,17 @@ const fetchFromEndpoint = async (url: string): Promise<BlogPost[] | null> => {
   }
 };
 
-const mergePosts = (base: BlogPost[], incoming: BlogPost[]) => {
+const mergePosts = (base: BlogPost[], incoming: BlogPost[], deletedSlugs: Set<string>) => {
   const map = new Map<string, BlogPost>();
-  base.forEach((post) => map.set(post.slug, post));
+  base.forEach((post) => {
+    if (!deletedSlugs.has(post.slug)) {
+      map.set(post.slug, post);
+    }
+  });
   incoming.forEach((post) => {
+    if (deletedSlugs.has(post.slug)) {
+      return;
+    }
     if (!map.has(post.slug)) {
       map.set(post.slug, post);
     }
@@ -107,11 +140,12 @@ const mergePosts = (base: BlogPost[], incoming: BlogPost[]) => {
 
 export const fetchBlogPosts = async (source: 'auto' | 'sheets' = 'auto'): Promise<BlogPost[]> => {
   const localPosts = getBlogPosts();
+  const deletedSlugs = new Set(readDeletedSlugs());
   if (typeof window !== 'undefined' && source === 'auto') {
     const baseUrl = import.meta.env.BASE_URL ?? '/';
     const staticPosts = await fetchFromEndpoint(`${baseUrl}${STATIC_BLOG_PATH}`);
     if (staticPosts) {
-      const merged = mergePosts(localPosts, staticPosts);
+      const merged = mergePosts(localPosts, staticPosts, deletedSlugs);
       saveBlogPosts(merged);
       return merged;
     }
@@ -120,7 +154,7 @@ export const fetchBlogPosts = async (source: 'auto' | 'sheets' = 'auto'): Promis
   if (BLOG_SHEETS_ENDPOINT) {
     const sheetPosts = await fetchFromEndpoint(BLOG_SHEETS_ENDPOINT);
     if (sheetPosts) {
-      const merged = mergePosts(localPosts, sheetPosts);
+      const merged = mergePosts(localPosts, sheetPosts, deletedSlugs);
       saveBlogPosts(merged);
       return merged;
     }
@@ -134,6 +168,8 @@ export const upsertBlogPost = async (
   previousSlug?: string
 ): Promise<BlogPost[]> => {
   const current = getBlogPosts();
+  const deleted = readDeletedSlugs().filter((slug) => slug !== post.slug);
+  saveDeletedSlugs(deleted);
   const cleaned = previousSlug
     ? current.filter((item) => item.slug !== previousSlug)
     : current;
@@ -165,6 +201,10 @@ export const upsertBlogPost = async (
 export const deleteBlogPost = async (slug: string): Promise<BlogPost[]> => {
   const current = getBlogPosts();
   const next = current.filter((item) => item.slug !== slug);
+  const deleted = readDeletedSlugs();
+  if (!deleted.includes(slug)) {
+    saveDeletedSlugs([...deleted, slug]);
+  }
   saveBlogPosts(next);
 
   if (!BLOG_SHEETS_ENDPOINT) {

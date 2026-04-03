@@ -105,5 +105,18 @@ describe('blog helpers', () => {
       body: JSON.stringify({ action: 'delete', slug: removeSlug }),
     }));
     expect(response.find((item) => item.slug === removeSlug)).toBeUndefined();
+    expect(JSON.parse(window.localStorage.getItem('lesya_blog_deleted') ?? '[]')).toContain(
+      removeSlug
+    );
+  });
+
+  it('filters deleted posts from base posts', () => {
+    const basePosts = getBlogPosts();
+    const removeSlug = basePosts[0].slug;
+    window.localStorage.setItem('lesya_blog_deleted', JSON.stringify([removeSlug]));
+
+    const filtered = getBlogPosts();
+
+    expect(filtered.find((item) => item.slug === removeSlug)).toBeUndefined();
   });
 });
