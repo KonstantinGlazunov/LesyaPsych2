@@ -10,6 +10,21 @@ import {
 } from '../lib/contact';
 
 const PsyFooter = () => {
+  const homeHref = getHomeHref();
+  const handleAnchorClick = (event: React.MouseEvent<HTMLAnchorElement>, hash: string) => {
+    const page = new URLSearchParams(window.location.search).get('page');
+    if (page) {
+      event.preventDefault();
+      window.location.href = `${homeHref}${hash}`;
+      return;
+    }
+    const element = document.querySelector(hash);
+    if (element) {
+      event.preventDefault();
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <footer className="w-full bg-[#2B2B2B] text-white py-12 px-4 sm:px-6 lg:px-8 xl:px-12">
       <div className="max-w-7xl mx-auto">
@@ -69,16 +84,32 @@ const PsyFooter = () => {
           <div>
             <h4 className="text-sm uppercase tracking-wider text-white/60 mb-4">Навигация</h4>
             <div className="space-y-2">
-              <a href={getHomeHref('#about')} className="block text-white/80 hover:text-white transition-colors text-sm">
+              <a
+                href={`${homeHref}#about`}
+                onClick={(event) => handleAnchorClick(event, '#about')}
+                className="block text-white/80 hover:text-white transition-colors text-sm"
+              >
                 Обо мне
               </a>
-              <a href={getHomeHref('#states')} className="block text-white/80 hover:text-white transition-colors text-sm">
+              <a
+                href={`${homeHref}#states`}
+                onClick={(event) => handleAnchorClick(event, '#states')}
+                className="block text-white/80 hover:text-white transition-colors text-sm"
+              >
                 С чем работаю
               </a>
-              <a href={getHomeHref('#process')} className="block text-white/80 hover:text-white transition-colors text-sm">
+              <a
+                href={`${homeHref}#process`}
+                onClick={(event) => handleAnchorClick(event, '#process')}
+                className="block text-white/80 hover:text-white transition-colors text-sm"
+              >
                 Как проходит консультация
               </a>
-              <a href={getHomeHref('#cta')} className="block text-white/80 hover:text-white transition-colors text-sm">
+              <a
+                href={`${homeHref}#cta`}
+                onClick={(event) => handleAnchorClick(event, '#cta')}
+                className="block text-white/80 hover:text-white transition-colors text-sm"
+              >
                 Связаться
               </a>
               <a href={getLegalHref('impressum')} className="block text-white/80 hover:text-white transition-colors text-sm">
