@@ -61,6 +61,7 @@ function App() {
   if (legalPage) {
     return (
       <>
+        <PsyNavigation />
         <LegalPage page={legalPage} />
         <PsyFooter />
       </>
@@ -70,6 +71,7 @@ function App() {
   if (isBlogPage) {
     return (
       <>
+        <PsyNavigation />
         <BlogPage postSlug={blogSlug ?? undefined} />
         <PsyFooter />
       </>
