@@ -131,7 +131,7 @@ const BlogAdmin = () => {
         setPreviewUrl(saved.coverImage);
       }
       setCoverFile(null);
-      alert('Статья сохранена.');
+      // Успешное сохранение: без всплывающих окон.
     } catch (error) {
       console.error(error);
       alert('Не удалось сохранить статью или изображение.');
