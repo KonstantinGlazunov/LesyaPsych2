@@ -30,6 +30,7 @@ const BlogAdmin = () => {
   const [isLoading, setIsLoading] = useState(cachedPosts.length === 0);
   const [isSaving, setIsSaving] = useState(false);
   const [selectedSlug, setSelectedSlug] = useState<string>('');
+  const [originalSlug, setOriginalSlug] = useState<string>('');
   const [draft, setDraft] = useState<BlogPost>(() => createEmptyPost());
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
 
@@ -43,6 +44,7 @@ const BlogAdmin = () => {
         setPosts(items);
         if (items[0]) {
           setSelectedSlug(items[0].slug);
+          setOriginalSlug(items[0].slug);
           setDraft({ ...items[0] });
           setPreviewUrl(items[0].coverImage);
         }
@@ -63,6 +65,7 @@ const BlogAdmin = () => {
     if (existing) {
       setDraft({ ...existing });
       setPreviewUrl(existing.coverImage);
+      setOriginalSlug(existing.slug);
     }
   };
 
@@ -94,9 +97,13 @@ const BlogAdmin = () => {
     };
     try {
       setIsSaving(true);
-      const nextPosts = await upsertBlogPost(normalized);
+      const nextPosts = await upsertBlogPost(
+        normalized,
+        originalSlug && originalSlug !== normalized.slug ? originalSlug : undefined
+      );
       setPosts(nextPosts);
       setSelectedSlug(normalized.slug);
+      setOriginalSlug(normalized.slug);
       await triggerPublish();
       alert('Статья сохранена. Публикация появится через 2 минуты.');
     } catch (error) {
@@ -109,6 +116,7 @@ const BlogAdmin = () => {
 
   const handleNew = () => {
     setSelectedSlug('');
+    setOriginalSlug('');
     setDraft(createEmptyPost());
     setPreviewUrl(undefined);
   };

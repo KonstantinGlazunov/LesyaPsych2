@@ -94,32 +94,52 @@ const fetchFromEndpoint = async (url: string): Promise<BlogPost[] | null> => {
   }
 };
 
+const mergePosts = (base: BlogPost[], incoming: BlogPost[]) => {
+  const map = new Map<string, BlogPost>();
+  base.forEach((post) => map.set(post.slug, post));
+  incoming.forEach((post) => {
+    if (!map.has(post.slug)) {
+      map.set(post.slug, post);
+    }
+  });
+  return Array.from(map.values());
+};
+
 export const fetchBlogPosts = async (source: 'auto' | 'sheets' = 'auto'): Promise<BlogPost[]> => {
+  const localPosts = getBlogPosts();
   if (typeof window !== 'undefined' && source === 'auto') {
     const baseUrl = import.meta.env.BASE_URL ?? '/';
     const staticPosts = await fetchFromEndpoint(`${baseUrl}${STATIC_BLOG_PATH}`);
     if (staticPosts) {
-      saveBlogPosts(staticPosts);
-      return staticPosts;
+      const merged = mergePosts(localPosts, staticPosts);
+      saveBlogPosts(merged);
+      return merged;
     }
   }
 
   if (BLOG_SHEETS_ENDPOINT) {
     const sheetPosts = await fetchFromEndpoint(BLOG_SHEETS_ENDPOINT);
     if (sheetPosts) {
-      saveBlogPosts(sheetPosts);
-      return sheetPosts;
+      const merged = mergePosts(localPosts, sheetPosts);
+      saveBlogPosts(merged);
+      return merged;
     }
   }
 
-  return getBlogPosts();
+  return localPosts;
 };
 
-export const upsertBlogPost = async (post: BlogPost): Promise<BlogPost[]> => {
+export const upsertBlogPost = async (
+  post: BlogPost,
+  previousSlug?: string
+): Promise<BlogPost[]> => {
   const current = getBlogPosts();
-  const next = current.some((item) => item.slug === post.slug)
-    ? current.map((item) => (item.slug === post.slug ? post : item))
-    : [post, ...current];
+  const cleaned = previousSlug
+    ? current.filter((item) => item.slug !== previousSlug)
+    : current;
+  const next = cleaned.some((item) => item.slug === post.slug)
+    ? cleaned.map((item) => (item.slug === post.slug ? post : item))
+    : [post, ...cleaned];
   saveBlogPosts(next);
 
   if (!BLOG_SHEETS_ENDPOINT) {
