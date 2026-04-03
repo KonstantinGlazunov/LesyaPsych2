@@ -43,6 +43,8 @@ const BlogAdmin = () => {
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const slugIsValid = !draft.slug || slugPattern.test(draft.slug);
+  const [statusMessage, setStatusMessage] = useState<string>('');
+  const [statusTone, setStatusTone] = useState<'success' | 'error' | ''>('');
 
   useEffect(() => {
     return () => {
@@ -118,6 +120,8 @@ const BlogAdmin = () => {
     };
     try {
       setIsSaving(true);
+      setStatusMessage('');
+      setStatusTone('');
       const nextPosts = await upsertBlogPost(
         normalized,
         originalSlug && originalSlug !== normalized.slug ? originalSlug : undefined,
@@ -131,10 +135,16 @@ const BlogAdmin = () => {
         setPreviewUrl(saved.coverImage);
       }
       setCoverFile(null);
-      // Успешное сохранение: без всплывающих окон.
+      setStatusMessage('Статья сохранена.');
+      setStatusTone('success');
+      window.setTimeout(() => {
+        setStatusMessage('');
+        setStatusTone('');
+      }, 3000);
     } catch (error) {
       console.error(error);
-      alert('Не удалось сохранить статью или изображение.');
+      setStatusMessage('Не удалось сохранить статью или изображение.');
+      setStatusTone('error');
     } finally {
       setIsSaving(false);
     }
@@ -230,6 +240,19 @@ const BlogAdmin = () => {
             {isSaving && (
               <div className="absolute inset-0 bg-white/70 rounded-[1.5rem] flex items-center justify-center">
                 <span className="h-10 w-10 rounded-full border-4 border-[#D8B4A0] border-t-transparent animate-spin" />
+              </div>
+            )}
+            {statusMessage && (
+              <div
+                className={`rounded-xl border px-4 py-2 text-sm ${
+                  statusTone === 'success'
+                    ? 'border-[#C9D7C5] bg-[#F3F7F2] text-[#2B4B2B]'
+                    : statusTone === 'error'
+                      ? 'border-[#E8C9C2] bg-[#FBF3F1] text-[#7A2E22]'
+                      : 'border-[#E6DDD6] bg-white/80 text-[#7A6B63]'
+                }`}
+              >
+                {statusMessage}
               </div>
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
