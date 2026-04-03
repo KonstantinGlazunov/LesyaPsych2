@@ -3,7 +3,7 @@ export const CONTACT_NAME_DE = 'Lesya Afanasyeva';
 export const CONTACT_ADDRESS = 'Ferbornstraße 1A, 35619 Braunfels';
 export const CONTACT_PHONE_DISPLAY = '+49 1517 4402744';
 export const CONTACT_PHONE_RAW = '4915174402744';
-export const CONTACT_EMAIL = 'lesya@example.com';
+export const CONTACT_EMAIL = 'lesiaafanasjew@gmail.com';
 
 const whatsappMessage = 'Здравствуйте, хочу записаться на консультацию.';
 const telegramMessage = 'Здравствуйте, хочу записаться на консультацию.';
