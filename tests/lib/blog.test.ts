@@ -54,6 +54,7 @@ describe('blog helpers', () => {
   });
 
   it('fetches static blog data and caches it', async () => {
+    const basePosts = getBlogPosts();
     const staticPosts = [createPost({ slug: 'static-post' })];
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: true,
@@ -61,11 +62,13 @@ describe('blog helpers', () => {
     }));
 
     const posts = await fetchBlogPosts();
-    expect(posts).toEqual(staticPosts);
-    expect(JSON.parse(window.localStorage.getItem('lesya_blog_posts') ?? '[]')).toEqual(staticPosts);
+    const merged = [...basePosts, ...staticPosts];
+    expect(posts).toEqual(merged);
+    expect(JSON.parse(window.localStorage.getItem('lesya_blog_posts') ?? '[]')).toEqual(merged);
   });
 
   it('upserts a blog post via the sheets endpoint', async () => {
+    const basePosts = getBlogPosts();
     const freshPost = createPost({ slug: 'upserted' });
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
@@ -77,8 +80,9 @@ describe('blog helpers', () => {
 
     expect(fetchMock).toHaveBeenCalledWith(BLOG_SHEETS_ENDPOINT, expect.objectContaining({
       method: 'POST',
+      mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     }));
-    expect(response).toEqual([freshPost]);
+    expect(response).toEqual([freshPost, ...basePosts]);
   });
 });
