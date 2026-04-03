@@ -24,6 +24,13 @@ const calculateReadingTime = (text: string) => {
   return `${minutes} минут`;
 };
 
+const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const normalizeSlugInput = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '');
+
 const BlogAdmin = () => {
   const cachedPosts = getBlogPosts();
   const [posts, setPosts] = useState<BlogPost[]>(cachedPosts);
@@ -35,6 +42,7 @@ const BlogAdmin = () => {
   const [draft, setDraft] = useState<BlogPost>(() => createEmptyPost());
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
   const [coverFile, setCoverFile] = useState<File | null>(null);
+  const slugIsValid = !draft.slug || slugPattern.test(draft.slug);
 
   useEffect(() => {
     return () => {
@@ -96,6 +104,10 @@ const BlogAdmin = () => {
   const handleSave = async () => {
     if (!draft.slug || !draft.title) {
       alert('Заполните адрес статьи и заголовок.');
+      return;
+    }
+    if (!slugPattern.test(draft.slug)) {
+      alert('Slug должен содержать только латинские буквы, цифры и дефисы.');
       return;
     }
     const normalized: BlogPost = {
@@ -180,9 +192,6 @@ const BlogAdmin = () => {
         <p className="text-[#4B4B4B] mb-10 max-w-2xl">
           Здесь можно создавать и редактировать статьи для SEO. Данные сохраняются в Supabase.
         </p>
-        <div className="mb-8 rounded-2xl border border-[#E6DDD6] bg-white/80 p-4 text-sm text-[#7A6B63]">
-          Статьи сразу доступны в блоге после сохранения.
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
           <aside className="bg-white rounded-[1.5rem] p-6 shadow-soft">
@@ -227,17 +236,30 @@ const BlogAdmin = () => {
                   onChange={(event) => setDraft((prev) => ({ ...prev, title: event.target.value }))}
                   className="w-full rounded-xl border border-[#E6DDD6] px-3 py-2 text-sm text-[#2B2B2B]"
                 />
+                <span className="block text-xs text-[#9B8D86]">
+                  До 60 символов, ключевая фраза ближе к началу.
+                </span>
               </label>
               <label className="space-y-2 text-sm text-[#7A6B63]">
                 Адрес страницы (slug)
                 <input
                   value={draft.slug}
                   onChange={(event) =>
-                    setDraft((prev) => ({ ...prev, slug: event.target.value.trim() }))
+                    setDraft((prev) => ({ ...prev, slug: normalizeSlugInput(event.target.value) }))
                   }
                   placeholder="primer-stati"
-                  className="w-full rounded-xl border border-[#E6DDD6] px-3 py-2 text-sm text-[#2B2B2B]"
+                  className={`w-full rounded-xl border px-3 py-2 text-sm text-[#2B2B2B] ${
+                    slugIsValid ? 'border-[#E6DDD6]' : 'border-[#D07A6B]'
+                  }`}
                 />
+                <span className="block text-xs text-[#9B8D86]">
+                  Только латиница, цифры и дефисы. Без пробелов. Пример: primer-stati.
+                </span>
+                {!slugIsValid && (
+                  <span className="block text-xs text-[#B45344]">
+                    Допустимы только латинские буквы, цифры и дефисы.
+                  </span>
+                )}
               </label>
             </div>
 
@@ -248,6 +270,9 @@ const BlogAdmin = () => {
                 onChange={(event) => setDraft((prev) => ({ ...prev, excerpt: event.target.value }))}
                 className="w-full rounded-xl border border-[#E6DDD6] px-3 py-2 text-sm text-[#2B2B2B] min-h-[90px]"
               />
+              <span className="block text-xs text-[#9B8D86]">
+                140–170 символов, ключевая фраза один раз, завершайте смыслом.
+              </span>
             </label>
 
             <label className="space-y-2 text-sm text-[#7A6B63]">
@@ -258,6 +283,9 @@ const BlogAdmin = () => {
                 className="w-full rounded-xl border border-[#E6DDD6] px-3 py-2 text-sm text-[#2B2B2B] min-h-[220px]"
                 placeholder="Разделяйте абзацы пустой строкой."
               />
+              <span className="block text-xs text-[#9B8D86]">
+                Вступление 2–3 предложения, далее короткие абзацы и подзаголовки.
+              </span>
             </label>
 
             <div className="space-y-3">
@@ -274,12 +302,15 @@ const BlogAdmin = () => {
                   className="h-40 w-full object-cover rounded-xl"
                 />
               )}
+              <span className="block text-xs text-[#9B8D86]">
+                Рекомендуемый размер 1200×630, JPG или WebP.
+              </span>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
               <button
                 onClick={handleSave}
-                disabled={isSaving || isDeleting}
+                disabled={isSaving || isDeleting || !slugIsValid}
                 className="inline-flex items-center justify-center rounded-full bg-[#2B2B2B] text-white px-6 py-3 hover:bg-[#1F1F1F] transition-colors disabled:opacity-60"
               >
                 {isSaving ? 'Сохраняем...' : 'Сохранить статью'}

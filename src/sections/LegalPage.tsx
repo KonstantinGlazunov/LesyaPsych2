@@ -119,6 +119,8 @@ const legalContent: Record<
         title: '5. Empfänger der Daten',
         paragraphs: [
           'Empfängerinnen und Empfänger können technische Dienstleister für Hosting und IT-Betrieb sowie Kommunikationsdienstleister sein, soweit dies zur Bereitstellung der Website oder zur Kommunikation erforderlich ist.',
+          'Das Hosting der Website erfolgt über Vercel. Die Speicherung und Bereitstellung von Blogdaten sowie Bildern erfolgt über Supabase (Datenbank und Storage).',
+          'Mit diesen Anbietern können Auftragsverarbeitungsverträge abgeschlossen werden. Weitere Informationen finden Sie in den Datenschutzinformationen der jeweiligen Anbieter.',
           'Eine Weitergabe erfolgt im Übrigen nur, wenn eine gesetzliche Verpflichtung besteht oder Sie eingewilligt haben.',
         ],
       },
