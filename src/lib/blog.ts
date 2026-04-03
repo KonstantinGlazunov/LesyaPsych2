@@ -164,9 +164,9 @@ const mergePosts = (base: BlogPost[], incoming: BlogPost[], deletedSlugs: Set<st
   return Array.from(map.values());
 };
 
-const uploadCoverImage = async (file: File): Promise<string | null> => {
+const uploadCoverImage = async (file: File): Promise<string | undefined> => {
   if (!isSupabaseConfigured || !supabase) {
-    return null;
+    return undefined;
   }
   const extension = file.name.split('.').pop() || 'jpg';
   const safeName = file.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9.-]/g, '');
@@ -179,7 +179,7 @@ const uploadCoverImage = async (file: File): Promise<string | null> => {
     throw error;
   }
   const { data } = supabase.storage.from('blog-covers').getPublicUrl(path);
-  return data.publicUrl ?? null;
+  return data.publicUrl ?? undefined;
 };
 
 export const fetchBlogPosts = async (source: 'auto' | 'sheets' = 'auto'): Promise<BlogPost[]> => {
