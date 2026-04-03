@@ -1,20 +1,22 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
+import { getHomeHref } from '../lib/contact';
 
 const navLinks = [
-  { label: 'Главная', href: '#hero' },
-  { label: 'Обо мне', href: '#about' },
-  { label: 'С чем работаю', href: '#states' },
-  { label: 'Как проходит консультация', href: '#process' },
-  { label: 'Контакты', href: '#cta' },
-  { label: 'Блог', href: '?page=blog', external: true },
+  { label: 'Главная', hash: '#hero' },
+  { label: 'Обо мне', hash: '#about' },
+  { label: 'С чем работаю', hash: '#states' },
+  { label: 'Как проходит консультация', hash: '#process' },
+  { label: 'Контакты', hash: '#cta' },
 ];
 
 const PsyNavigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const baseUrl = import.meta.env.BASE_URL;
+  const homeHref = getHomeHref();
+  const blogHref = `${homeHref}?page=blog`;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,14 +27,20 @@ const PsyNavigation = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, hash: string) => {
     e.preventDefault();
     setIsMobileMenuOpen(false);
-    
-    const element = document.querySelector(href);
+    const page = new URLSearchParams(window.location.search).get('page');
+    if (page) {
+      window.location.href = `${homeHref}${hash}`;
+      return;
+    }
+    const element = document.querySelector(hash);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+      return;
     }
+    window.location.hash = hash;
   };
 
   return (
@@ -51,8 +59,8 @@ const PsyNavigation = () => {
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
             <a
-              href="#hero"
-              onClick={(e) => handleLinkClick(e, '#hero')}
+              href={`${homeHref}#hero`}
+              onClick={(e) => handleAnchorClick(e, '#hero')}
               className="inline-flex items-center gap-3 text-[#2B2B2B] font-serif text-lg lg:text-xl leading-tight"
             >
               <img
@@ -67,14 +75,20 @@ const PsyNavigation = () => {
             <nav className="hidden lg:flex items-center gap-8">
               {navLinks.map((link) => (
                 <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={link.external ? undefined : (e) => handleLinkClick(e, link.href)}
+                  key={link.hash}
+                  href={`${homeHref}${link.hash}`}
+                  onClick={(e) => handleAnchorClick(e, link.hash)}
                   className="text-[#5A5A5A] hover:text-[#2B2B2B] transition-colors text-sm"
                 >
                   {link.label}
                 </a>
               ))}
+              <a
+                href={blogHref}
+                className="text-[#5A5A5A] hover:text-[#2B2B2B] transition-colors text-sm"
+              >
+                Блог
+              </a>
             </nav>
 
             {/* Mobile Menu Button */}
@@ -120,9 +134,9 @@ const PsyNavigation = () => {
               <div className="space-y-1">
                 {navLinks.map((link, index) => (
                   <motion.a
-                    key={link.href}
-                    href={link.href}
-                    onClick={link.external ? undefined : (e) => handleLinkClick(e, link.href)}
+                    key={link.hash}
+                    href={`${homeHref}${link.hash}`}
+                    onClick={(e) => handleAnchorClick(e, link.hash)}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, delay: index * 0.1 }}
@@ -131,6 +145,15 @@ const PsyNavigation = () => {
                     {link.label}
                   </motion.a>
                 ))}
+                <motion.a
+                  href={blogHref}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: navLinks.length * 0.1 }}
+                  className="block py-3 text-[#2B2B2B] text-lg border-b border-[#2B2B2B]/10"
+                >
+                  Блог
+                </motion.a>
               </div>
             </motion.nav>
           </motion.div>
