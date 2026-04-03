@@ -48,6 +48,9 @@ const PsyCTA = () => {
               className="text-white/80 text-base sm:text-lg mb-8 max-w-lg mx-auto"
             >
               Мы спокойно обсудим вашу ситуацию и найдём лучший путь вперёд вместе.
+              <span className="block mt-2 text-white font-medium">
+                Первая консультация — бесплатно.
+              </span>
             </motion.p>
             
             <motion.div
