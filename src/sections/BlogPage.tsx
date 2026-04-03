@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchBlogPosts, getBlogPosts } from '../lib/blog';
+import { fetchBlogPosts, getBlogPosts, resolveCoverImage } from '../lib/blog';
 import type { BlogPost } from '../lib/blog';
 import { getHomeHref } from '../lib/contact';
 
@@ -8,7 +8,6 @@ type BlogPageProps = {
 };
 
 const BlogPage = ({ postSlug }: BlogPageProps) => {
-  const baseUrl = import.meta.env.BASE_URL;
   const cachedPosts = getBlogPosts();
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>(cachedPosts);
   const [isLoading, setIsLoading] = useState(cachedPosts.length === 0);
@@ -69,11 +68,7 @@ const BlogPage = ({ postSlug }: BlogPageProps) => {
   }
 
   if (post) {
-    const coverSrc = post.coverImage?.startsWith('data:')
-      ? post.coverImage
-      : post.coverImage
-        ? `${baseUrl}${post.coverImage}`
-        : undefined;
+    const coverSrc = resolveCoverImage(post.coverImage);
     const paragraphs = post.content
       .split('\n\n')
       .map((item) => item.trim())
@@ -173,11 +168,7 @@ const BlogPage = ({ postSlug }: BlogPageProps) => {
               >
                 {item.coverImage && (
                   <img
-                    src={
-                      item.coverImage.startsWith('data:')
-                        ? item.coverImage
-                        : `${baseUrl}${item.coverImage}`
-                    }
+                    src={resolveCoverImage(item.coverImage)}
                     alt={item.title}
                     className="h-52 w-full object-cover"
                   />

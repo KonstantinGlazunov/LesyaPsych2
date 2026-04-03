@@ -1,3 +1,5 @@
+import { isSupabaseConfigured, supabase } from './supabaseClient';
+
 export type BlogPost = {
   slug: string;
   title: string;
@@ -8,7 +10,6 @@ export type BlogPost = {
   content: string;
 };
 
-export const BLOG_SHEETS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbylEL3g7Wyu5n4mNQzFSeuA3fTDK516epmumyklTzC9fUQwVeNYPIffDppJ_wSjWOCF/exec';
 const STATIC_BLOG_PATH = 'blog.json';
 
 const STORAGE_KEY = 'lesya_blog_posts';
@@ -106,6 +107,31 @@ const normalizePost = (post: BlogPost): BlogPost => ({
   content: post.content.trim(),
 });
 
+type SupabasePost = {
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  date: string | null;
+  reading_time: string | null;
+  cover_image: string | null;
+  content: string | null;
+  updated_at?: string | null;
+  created_at?: string | null;
+};
+
+const mapFromSupabase = (row: SupabasePost): BlogPost => ({
+  slug: row.slug,
+  title: row.title ?? '',
+  excerpt: row.excerpt ?? '',
+  date: row.date ?? '',
+  readingTime: row.reading_time ?? '',
+  coverImage: row.cover_image ?? undefined,
+  content: row.content ?? '',
+});
+
+const isExternalUrl = (value?: string) =>
+  Boolean(value && (/^https?:\/\//i.test(value) || value.startsWith('blob:')));
+
 const fetchFromEndpoint = async (url: string): Promise<BlogPost[] | null> => {
   try {
     const response = await fetch(url, { method: 'GET' });
@@ -138,9 +164,40 @@ const mergePosts = (base: BlogPost[], incoming: BlogPost[], deletedSlugs: Set<st
   return Array.from(map.values());
 };
 
+const uploadCoverImage = async (file: File): Promise<string | null> => {
+  if (!isSupabaseConfigured || !supabase) {
+    return null;
+  }
+  const extension = file.name.split('.').pop() || 'jpg';
+  const safeName = file.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9.-]/g, '');
+  const path = `covers/${Date.now()}-${safeName || `cover.${extension}`}`;
+  const { error } = await supabase.storage.from('blog-covers').upload(path, file, {
+    upsert: true,
+    cacheControl: '3600',
+  });
+  if (error) {
+    throw error;
+  }
+  const { data } = supabase.storage.from('blog-covers').getPublicUrl(path);
+  return data.publicUrl ?? null;
+};
+
 export const fetchBlogPosts = async (source: 'auto' | 'sheets' = 'auto'): Promise<BlogPost[]> => {
   const localPosts = getBlogPosts();
   const deletedSlugs = new Set(readDeletedSlugs());
+  if (isSupabaseConfigured && supabase) {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select('slug,title,excerpt,date,reading_time,cover_image,content,updated_at,created_at')
+      .order('updated_at', { ascending: false });
+    if (!error && data && data.length > 0) {
+      const normalized = data.map((row) => normalizePost(mapFromSupabase(row as SupabasePost)));
+      const merged = mergePosts(localPosts, normalized, deletedSlugs);
+      saveBlogPosts(merged);
+      return merged;
+    }
+  }
+
   if (typeof window !== 'undefined' && source === 'auto') {
     const baseUrl = import.meta.env.BASE_URL ?? '/';
     const staticPosts = await fetchFromEndpoint(`${baseUrl}${STATIC_BLOG_PATH}`);
@@ -151,21 +208,13 @@ export const fetchBlogPosts = async (source: 'auto' | 'sheets' = 'auto'): Promis
     }
   }
 
-  if (BLOG_SHEETS_ENDPOINT) {
-    const sheetPosts = await fetchFromEndpoint(BLOG_SHEETS_ENDPOINT);
-    if (sheetPosts) {
-      const merged = mergePosts(localPosts, sheetPosts, deletedSlugs);
-      saveBlogPosts(merged);
-      return merged;
-    }
-  }
-
   return localPosts;
 };
 
 export const upsertBlogPost = async (
   post: BlogPost,
-  previousSlug?: string
+  previousSlug?: string,
+  coverFile?: File | null
 ): Promise<BlogPost[]> => {
   const current = getBlogPosts();
   const deleted = readDeletedSlugs().filter((slug) => slug !== post.slug);
@@ -178,21 +227,28 @@ export const upsertBlogPost = async (
     : [post, ...cleaned];
   saveBlogPosts(next);
 
-  if (!BLOG_SHEETS_ENDPOINT) {
+  if (!isSupabaseConfigured || !supabase) {
     return next;
   }
 
   try {
-    await fetch(BLOG_SHEETS_ENDPOINT, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8',
-      },
-      body: JSON.stringify(post),
-    });
-  } catch {
-    // Если запись в Sheets недоступна из браузера, оставляем локальную копию.
+    let coverImage = post.coverImage;
+    if (coverFile) {
+      coverImage = await uploadCoverImage(coverFile);
+    }
+    const payload = {
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.excerpt,
+      date: post.date,
+      reading_time: post.readingTime,
+      cover_image: coverImage ?? null,
+      content: post.content,
+      updated_at: new Date().toISOString(),
+    };
+    await supabase.from('blog_posts').upsert(payload, { onConflict: 'slug' });
+  } catch (error) {
+    console.error(error);
   }
 
   return next;
@@ -207,36 +263,32 @@ export const deleteBlogPost = async (slug: string): Promise<BlogPost[]> => {
   }
   saveBlogPosts(next);
 
-  if (!BLOG_SHEETS_ENDPOINT) {
+  if (!isSupabaseConfigured || !supabase) {
     return next;
   }
 
   try {
-    await fetch(BLOG_SHEETS_ENDPOINT, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {
-        'Content-Type': 'text/plain;charset=utf-8',
-      },
-      body: JSON.stringify({ action: 'delete', slug }),
-    });
-  } catch {
-    // Если удаление в Sheets недоступно, оставляем локальную копию.
+    await supabase.from('blog_posts').delete().eq('slug', slug);
+  } catch (error) {
+    console.error(error);
   }
 
   return next;
 };
 
 export const triggerPublish = async () => {
-  if (!BLOG_SHEETS_ENDPOINT) {
-    return;
-  }
-  try {
-    await fetch(`${BLOG_SHEETS_ENDPOINT}?action=trigger`, {
-      method: 'POST',
-      mode: 'no-cors',
-    });
-  } catch {
-    // Нет доступа к триггеру публикации.
-  }
+  return;
 };
+
+export const resolveCoverImage = (coverImage?: string) => {
+  if (!coverImage) {
+    return undefined;
+  }
+  if (coverImage.startsWith('data:') || isExternalUrl(coverImage)) {
+    return coverImage;
+  }
+  const baseUrl = import.meta.env.BASE_URL ?? '/';
+  return `${baseUrl}${coverImage}`;
+};
+
+export { uploadCoverImage };

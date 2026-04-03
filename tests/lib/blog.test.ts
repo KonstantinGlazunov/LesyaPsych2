@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { type BlogPost, BLOG_SHEETS_ENDPOINT } from '@/lib/blog';
+import { type BlogPost } from '@/lib/blog';
 import {
   deleteBlogPost,
   fetchBlogPosts,
@@ -68,42 +68,21 @@ describe('blog helpers', () => {
     expect(JSON.parse(window.localStorage.getItem('lesya_blog_posts') ?? '[]')).toEqual(merged);
   });
 
-  it('upserts a blog post via the sheets endpoint', async () => {
+  it('upserts a blog post locally when supabase is not configured', async () => {
     const basePosts = getBlogPosts();
     const freshPost = createPost({ slug: 'upserted' });
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => [freshPost],
-    });
-    vi.stubGlobal('fetch', fetchMock);
 
     const response = await upsertBlogPost(freshPost);
 
-    expect(fetchMock).toHaveBeenCalledWith(BLOG_SHEETS_ENDPOINT, expect.objectContaining({
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    }));
     expect(response).toEqual([freshPost, ...basePosts]);
   });
 
-  it('deletes a blog post via the sheets endpoint', async () => {
+  it('deletes a blog post locally when supabase is not configured', async () => {
     const basePosts = getBlogPosts();
     const removeSlug = basePosts[0].slug;
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => [],
-    });
-    vi.stubGlobal('fetch', fetchMock);
 
     const response = await deleteBlogPost(removeSlug);
 
-    expect(fetchMock).toHaveBeenCalledWith(BLOG_SHEETS_ENDPOINT, expect.objectContaining({
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'delete', slug: removeSlug }),
-    }));
     expect(response.find((item) => item.slug === removeSlug)).toBeUndefined();
     expect(JSON.parse(window.localStorage.getItem('lesya_blog_deleted') ?? '[]')).toContain(
       removeSlug

@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import {
-  BLOG_SHEETS_ENDPOINT,
   deleteBlogPost,
   fetchBlogPosts,
   getBlogPosts,
-  triggerPublish,
+  resolveCoverImage,
   upsertBlogPost,
 } from '../lib/blog';
 import type { BlogPost } from '../lib/blog';
@@ -35,6 +34,15 @@ const BlogAdmin = () => {
   const [originalSlug, setOriginalSlug] = useState<string>('');
   const [draft, setDraft] = useState<BlogPost>(() => createEmptyPost());
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl?.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   useEffect(() => {
     let isMounted = true;
@@ -49,6 +57,7 @@ const BlogAdmin = () => {
           setOriginalSlug(items[0].slug);
           setDraft({ ...items[0] });
           setPreviewUrl(items[0].coverImage);
+          setCoverFile(null);
         }
       })
       .finally(() => {
@@ -68,22 +77,20 @@ const BlogAdmin = () => {
       setDraft({ ...existing });
       setPreviewUrl(existing.coverImage);
       setOriginalSlug(existing.slug);
+      setCoverFile(null);
     }
   };
 
   const handleFileChange = (file?: File | null) => {
     if (!file) {
       setPreviewUrl(undefined);
+      setCoverFile(null);
       setDraft((prev) => ({ ...prev, coverImage: undefined }));
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = typeof reader.result === 'string' ? reader.result : undefined;
-      setPreviewUrl(result);
-      setDraft((prev) => ({ ...prev, coverImage: result }));
-    };
-    reader.readAsDataURL(file);
+    setCoverFile(file);
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
   };
 
   const handleSave = async () => {
@@ -101,13 +108,14 @@ const BlogAdmin = () => {
       setIsSaving(true);
       const nextPosts = await upsertBlogPost(
         normalized,
-        originalSlug && originalSlug !== normalized.slug ? originalSlug : undefined
+        originalSlug && originalSlug !== normalized.slug ? originalSlug : undefined,
+        coverFile
       );
       setPosts(nextPosts);
       setSelectedSlug(normalized.slug);
       setOriginalSlug(normalized.slug);
-      await triggerPublish();
-      alert('Статья сохранена. Публикация появится через 2 минуты.');
+      setCoverFile(null);
+      alert('Статья сохранена.');
     } catch (error) {
       console.error(error);
       alert('Не удалось сохранить статью.');
@@ -121,6 +129,7 @@ const BlogAdmin = () => {
     setOriginalSlug('');
     setDraft(createEmptyPost());
     setPreviewUrl(undefined);
+    setCoverFile(null);
   };
 
   const handleDelete = async () => {
@@ -141,11 +150,11 @@ const BlogAdmin = () => {
         setOriginalSlug(nextPosts[0].slug);
         setDraft({ ...nextPosts[0] });
         setPreviewUrl(nextPosts[0].coverImage);
+        setCoverFile(null);
       } else {
         handleNew();
       }
-      await triggerPublish();
-      alert('Статья удалена. Публикация обновится через 2 минуты.');
+      alert('Статья удалена.');
     } catch (error) {
       console.error(error);
       alert('Не удалось удалить статью.');
@@ -169,16 +178,10 @@ const BlogAdmin = () => {
 
         <h1 className="text-3xl sm:text-4xl text-[#2B2B2B] mt-6 mb-4">Админка блога</h1>
         <p className="text-[#4B4B4B] mb-10 max-w-2xl">
-          Здесь можно создавать и редактировать статьи для SEO. При подключении Apps Script данные
-          сохраняются в Google Sheets.
+          Здесь можно создавать и редактировать статьи для SEO. Данные сохраняются в Supabase.
         </p>
-        {!BLOG_SHEETS_ENDPOINT && (
-          <div className="mb-8 rounded-2xl border border-[#E6DDD6] bg-white/80 p-4 text-sm text-[#7A6B63]">
-            Укажите ссылку Apps Script в коде (BLOG_SHEETS_ENDPOINT), чтобы статьи сохранялись в Google Sheets.
-          </div>
-        )}
         <div className="mb-8 rounded-2xl border border-[#E6DDD6] bg-white/80 p-4 text-sm text-[#7A6B63]">
-          Публикация запускается автоматически после сохранения статьи.
+          Статьи сразу доступны в блоге после сохранения.
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
@@ -266,7 +269,7 @@ const BlogAdmin = () => {
               />
               {previewUrl && (
                 <img
-                  src={previewUrl}
+                  src={resolveCoverImage(previewUrl)}
                   alt="Превью статьи"
                   className="h-40 w-full object-cover rounded-xl"
                 />
