@@ -169,6 +169,8 @@ const BlogAdmin = () => {
     }
     try {
       setIsDeleting(true);
+      setStatusMessage('');
+      setStatusTone('');
       const nextPosts = await deleteBlogPost(targetSlug);
       setPosts(nextPosts);
       if (nextPosts[0]) {
@@ -180,10 +182,16 @@ const BlogAdmin = () => {
       } else {
         handleNew();
       }
-      alert('Статья удалена.');
+      setStatusMessage('Статья удалена.');
+      setStatusTone('success');
+      window.setTimeout(() => {
+        setStatusMessage('');
+        setStatusTone('');
+      }, 3000);
     } catch (error) {
       console.error(error);
-      alert('Не удалось удалить статью.');
+      setStatusMessage('Не удалось удалить статью.');
+      setStatusTone('error');
     } finally {
       setIsDeleting(false);
     }
