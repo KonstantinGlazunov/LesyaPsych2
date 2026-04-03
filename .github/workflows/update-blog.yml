@@ -24,15 +24,12 @@ jobs:
           node-version: 20
 
       - name: Install
-        working-directory: app
         run: npm ci
 
       - name: Fetch blog posts
-        working-directory: app
         run: node scripts/fetch-blog.mjs
 
       - name: Commit blog.json if changed
-        working-directory: app
         run: |
           if git diff --quiet; then
             echo "No changes to commit"
@@ -45,7 +42,6 @@ jobs:
           git push
 
       - name: Build and deploy
-        working-directory: app
         env:
           GH_TOKEN: ${{ secrets.BLOG_UPDATE_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
