@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   BLOG_SHEETS_ENDPOINT,
+  deleteBlogPost,
   fetchBlogPosts,
   getBlogPosts,
   triggerPublish,
@@ -29,6 +30,7 @@ const BlogAdmin = () => {
   const [posts, setPosts] = useState<BlogPost[]>(cachedPosts);
   const [isLoading, setIsLoading] = useState(cachedPosts.length === 0);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [selectedSlug, setSelectedSlug] = useState<string>('');
   const [originalSlug, setOriginalSlug] = useState<string>('');
   const [draft, setDraft] = useState<BlogPost>(() => createEmptyPost());
@@ -119,6 +121,37 @@ const BlogAdmin = () => {
     setOriginalSlug('');
     setDraft(createEmptyPost());
     setPreviewUrl(undefined);
+  };
+
+  const handleDelete = async () => {
+    const targetSlug = originalSlug || selectedSlug;
+    if (!targetSlug) {
+      return;
+    }
+    const confirmed = window.confirm('Удалить статью? Это действие нельзя отменить.');
+    if (!confirmed) {
+      return;
+    }
+    try {
+      setIsDeleting(true);
+      const nextPosts = await deleteBlogPost(targetSlug);
+      setPosts(nextPosts);
+      if (nextPosts[0]) {
+        setSelectedSlug(nextPosts[0].slug);
+        setOriginalSlug(nextPosts[0].slug);
+        setDraft({ ...nextPosts[0] });
+        setPreviewUrl(nextPosts[0].coverImage);
+      } else {
+        handleNew();
+      }
+      await triggerPublish();
+      alert('Статья удалена. Публикация обновится через 2 минуты.');
+    } catch (error) {
+      console.error(error);
+      alert('Не удалось удалить статью.');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -240,13 +273,22 @@ const BlogAdmin = () => {
               )}
             </div>
 
-            <button
-              onClick={handleSave}
-              disabled={isSaving}
-              className="inline-flex items-center justify-center rounded-full bg-[#2B2B2B] text-white px-6 py-3 hover:bg-[#1F1F1F] transition-colors disabled:opacity-60"
-            >
-              {isSaving ? 'Сохраняем...' : 'Сохранить статью'}
-            </button>
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                onClick={handleSave}
+                disabled={isSaving || isDeleting}
+                className="inline-flex items-center justify-center rounded-full bg-[#2B2B2B] text-white px-6 py-3 hover:bg-[#1F1F1F] transition-colors disabled:opacity-60"
+              >
+                {isSaving ? 'Сохраняем...' : 'Сохранить статью'}
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={isSaving || isDeleting || !(originalSlug || selectedSlug)}
+                className="inline-flex items-center justify-center rounded-full border border-[#D7B7AA] text-[#A14B3C] px-6 py-3 hover:bg-[#F9F1EE] transition-colors disabled:opacity-60"
+              >
+                {isDeleting ? 'Удаляем...' : 'Удалить статью'}
+              </button>
+            </div>
           </div>
         </div>
       </div>

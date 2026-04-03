@@ -162,6 +162,31 @@ export const upsertBlogPost = async (
   return next;
 };
 
+export const deleteBlogPost = async (slug: string): Promise<BlogPost[]> => {
+  const current = getBlogPosts();
+  const next = current.filter((item) => item.slug !== slug);
+  saveBlogPosts(next);
+
+  if (!BLOG_SHEETS_ENDPOINT) {
+    return next;
+  }
+
+  try {
+    await fetch(BLOG_SHEETS_ENDPOINT, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8',
+      },
+      body: JSON.stringify({ action: 'delete', slug }),
+    });
+  } catch {
+    // Если удаление в Sheets недоступно, оставляем локальную копию.
+  }
+
+  return next;
+};
+
 export const triggerPublish = async () => {
   if (!BLOG_SHEETS_ENDPOINT) {
     return;
