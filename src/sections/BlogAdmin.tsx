@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   deleteBlogPost,
   fetchBlogPosts,
@@ -45,6 +45,7 @@ const BlogAdmin = () => {
   const slugIsValid = !draft.slug || slugPattern.test(draft.slug);
   const [statusMessage, setStatusMessage] = useState<string>('');
   const [statusTone, setStatusTone] = useState<'success' | 'error' | ''>('');
+  const statusRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     return () => {
@@ -138,6 +139,9 @@ const BlogAdmin = () => {
       setStatusMessage('Статья сохранена.');
       setStatusTone('success');
       window.setTimeout(() => {
+        statusRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
+      window.setTimeout(() => {
         setStatusMessage('');
         setStatusTone('');
       }, 3000);
@@ -184,6 +188,9 @@ const BlogAdmin = () => {
       }
       setStatusMessage('Статья удалена.');
       setStatusTone('success');
+      window.setTimeout(() => {
+        statusRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
       window.setTimeout(() => {
         setStatusMessage('');
         setStatusTone('');
@@ -252,6 +259,7 @@ const BlogAdmin = () => {
             )}
             {statusMessage && (
               <div
+                ref={statusRef}
                 className={`rounded-xl border px-4 py-2 text-sm ${
                   statusTone === 'success'
                     ? 'border-[#C9D7C5] bg-[#F3F7F2] text-[#2B4B2B]'
