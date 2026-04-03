@@ -216,15 +216,29 @@ export const upsertBlogPost = async (
   previousSlug?: string,
   coverFile?: File | null
 ): Promise<BlogPost[]> => {
+  let coverImage = post.coverImage;
+  try {
+    if (coverFile) {
+      coverImage = await uploadCoverImage(coverFile);
+    }
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+
+  const finalPost: BlogPost = {
+    ...post,
+    coverImage: coverImage ?? undefined,
+  };
   const current = getBlogPosts();
-  const deleted = readDeletedSlugs().filter((slug) => slug !== post.slug);
+  const deleted = readDeletedSlugs().filter((slug) => slug !== finalPost.slug);
   saveDeletedSlugs(deleted);
   const cleaned = previousSlug
     ? current.filter((item) => item.slug !== previousSlug)
     : current;
-  const next = cleaned.some((item) => item.slug === post.slug)
-    ? cleaned.map((item) => (item.slug === post.slug ? post : item))
-    : [post, ...cleaned];
+  const next = cleaned.some((item) => item.slug === finalPost.slug)
+    ? cleaned.map((item) => (item.slug === finalPost.slug ? finalPost : item))
+    : [finalPost, ...cleaned];
   saveBlogPosts(next);
 
   if (!isSupabaseConfigured || !supabase) {
@@ -232,18 +246,14 @@ export const upsertBlogPost = async (
   }
 
   try {
-    let coverImage = post.coverImage;
-    if (coverFile) {
-      coverImage = await uploadCoverImage(coverFile);
-    }
     const payload = {
-      slug: post.slug,
-      title: post.title,
-      excerpt: post.excerpt,
-      date: post.date,
-      reading_time: post.readingTime,
-      cover_image: coverImage ?? null,
-      content: post.content,
+      slug: finalPost.slug,
+      title: finalPost.title,
+      excerpt: finalPost.excerpt,
+      date: finalPost.date,
+      reading_time: finalPost.readingTime,
+      cover_image: finalPost.coverImage ?? null,
+      content: finalPost.content,
       updated_at: new Date().toISOString(),
     };
     await supabase.from('blog_posts').upsert(payload, { onConflict: 'slug' });

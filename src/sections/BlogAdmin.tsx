@@ -124,13 +124,17 @@ const BlogAdmin = () => {
         coverFile
       );
       setPosts(nextPosts);
+      const saved = nextPosts.find((item) => item.slug === normalized.slug);
       setSelectedSlug(normalized.slug);
       setOriginalSlug(normalized.slug);
+      if (saved?.coverImage) {
+        setPreviewUrl(saved.coverImage);
+      }
       setCoverFile(null);
       alert('Статья сохранена.');
     } catch (error) {
       console.error(error);
-      alert('Не удалось сохранить статью.');
+      alert('Не удалось сохранить статью или изображение.');
     } finally {
       setIsSaving(false);
     }
