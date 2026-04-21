@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import type { FormEvent } from 'react';
 import {
   deleteBlogPost,
   fetchBlogPosts,
@@ -8,6 +9,9 @@ import {
 } from '../lib/blog';
 import type { BlogPost } from '../lib/blog';
 import { getHomeHref } from '../lib/contact';
+
+const ADMIN_PASSWORD = 'Mia061019889!';
+const ADMIN_AUTH_KEY = 'lesya_blog_admin_authed';
 
 const createEmptyPost = (): BlogPost => ({
   slug: '',
@@ -33,6 +37,14 @@ const normalizeSlugInput = (value: string) =>
 
 const BlogAdmin = () => {
   const cachedPosts = getBlogPosts();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+    return window.sessionStorage.getItem(ADMIN_AUTH_KEY) === '1';
+  });
+  const [passwordInput, setPasswordInput] = useState('');
+  const [authError, setAuthError] = useState('');
   const [posts, setPosts] = useState<BlogPost[]>(cachedPosts);
   const [isLoading, setIsLoading] = useState(cachedPosts.length === 0);
   const [isSaving, setIsSaving] = useState(false);
@@ -56,6 +68,10 @@ const BlogAdmin = () => {
   }, [previewUrl]);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      setIsLoading(false);
+      return;
+    }
     let isMounted = true;
     fetchBlogPosts('auto')
       .then((items) => {
@@ -79,7 +95,62 @@ const BlogAdmin = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [isAuthenticated]);
+
+  const handleLogin = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (passwordInput !== ADMIN_PASSWORD) {
+      setAuthError('Неверный пароль.');
+      return;
+    }
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.setItem(ADMIN_AUTH_KEY, '1');
+    }
+    setAuthError('');
+    setPasswordInput('');
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.removeItem(ADMIN_AUTH_KEY);
+    }
+    setIsAuthenticated(false);
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <section className="min-h-screen bg-[#F7F4F2] px-4 sm:px-6 lg:px-8 xl:px-12 py-20">
+        <div className="max-w-lg mx-auto bg-white rounded-[1.5rem] p-8 shadow-soft">
+          <a href={getHomeHref()} className="inline-flex text-sm text-[#7A6B63] hover:text-[#2B2B2B] mb-4">
+            На главную
+          </a>
+          <h1 className="text-3xl text-[#2B2B2B] mb-4">Вход в админку</h1>
+          <p className="text-[#4B4B4B] mb-6">Введите пароль администратора блога.</p>
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <label className="space-y-2 text-sm text-[#7A6B63] block">
+              Пароль
+              <input
+                type="password"
+                value={passwordInput}
+                onChange={(event) => setPasswordInput(event.target.value)}
+                className="w-full rounded-xl border border-[#E6DDD6] px-3 py-2 text-sm text-[#2B2B2B]"
+                autoComplete="current-password"
+              />
+            </label>
+            {authError && <p className="text-sm text-[#B45344]">{authError}</p>}
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center rounded-full bg-[#2B2B2B] text-white px-6 py-3 hover:bg-[#1F1F1F] transition-colors"
+            >
+              Войти
+            </button>
+          </form>
+        </div>
+      </section>
+    );
+  }
 
   const handleSelect = (slug: string) => {
     setSelectedSlug(slug);
@@ -215,6 +286,10 @@ const BlogAdmin = () => {
           <a href={`${getHomeHref()}?page=blog`} className="hover:text-[#2B2B2B]">
             Блог
           </a>
+          <span>•</span>
+          <button onClick={handleLogout} className="hover:text-[#2B2B2B]">
+            Выйти
+          </button>
         </div>
 
         <h1 className="text-3xl sm:text-4xl text-[#2B2B2B] mt-6 mb-4">Админка блога</h1>

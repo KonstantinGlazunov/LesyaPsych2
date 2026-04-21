@@ -137,7 +137,7 @@ const PsyFooter = () => {
         <div className="border-t border-white/10 pt-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-white/40 text-xs text-center sm:text-left">
             <p>
-              © {new Date().getFullYear()} Леся Афанасьева. {uk ? 'Усі права захищені.' : 'Все права защищены.'}
+              © {new Date().getFullYear()} Леся Афанасьева. Alle Rechte vorbehalten.
             </p>
             <a
               href={uk ? `${getHomeHref()}?lang=uk&page=admin` : `${getHomeHref()}?page=admin`}
