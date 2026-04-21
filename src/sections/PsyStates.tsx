@@ -2,49 +2,60 @@ import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Brain, UserX, GitBranch, Zap, CircleDot } from 'lucide-react';
-
-const states = [
-  {
-    id: 1,
-    title: 'Тревожность',
-    description: 'Постоянное беспокойство, внутреннее напряжение, ощущение, что всё выходит из-под контроля.',
-    icon: Brain,
-    image: 'images/window.jpeg'
-  },
-  {
-    id: 2,
-    title: 'Потеря себя',
-    description: 'Ощущение оторванности от себя настоящего, своих ценностей и смыслов.',
-    icon: UserX,
-    image: 'images/window2.jpeg'
-  },
-  {
-    id: 3,
-    title: 'Сложности с выбором',
-    description: 'Паралич перед принятием решений, страх ошибиться, постоянные сомнения.',
-    icon: GitBranch,
-    image: 'images/sad.jpeg'
-  },
-  {
-    id: 4,
-    title: 'Эмоциональная перегрузка',
-    description: 'Когда эмоций слишком много, и не получается ни понять их, ни выразить.',
-    icon: Zap,
-    image: 'images/konflikt.jpeg'
-  },
-  {
-    id: 5,
-    title: 'Пустота',
-    description: 'Ощущение внутренней пустоты, отсутствие мотивации, неспособность радоваться.',
-    icon: CircleDot,
-    image: 'images/body.jpeg'
-  }
-];
+import { isUk } from '../lib/lang';
 
 const PsyStates = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const baseUrl = import.meta.env.BASE_URL;
+  const uk = isUk();
+  const states = [
+    {
+      id: 1,
+      title: uk ? 'Тривожність' : 'Тревожность',
+      description: uk
+        ? 'Постійне занепокоєння, внутрішнє напруження, відчуття, що все виходить з-під контролю.'
+        : 'Постоянное беспокойство, внутреннее напряжение, ощущение, что всё выходит из-под контроля.',
+      icon: Brain,
+      image: 'images/window.jpeg'
+    },
+    {
+      id: 2,
+      title: uk ? 'Втрата себе' : 'Потеря себя',
+      description: uk
+        ? 'Відчуття відірваності від себе справжнього, своїх цінностей і сенсів.'
+        : 'Ощущение оторванности от себя настоящего, своих ценностей и смыслов.',
+      icon: UserX,
+      image: 'images/window2.jpeg'
+    },
+    {
+      id: 3,
+      title: uk ? 'Складність із вибором' : 'Сложности с выбором',
+      description: uk
+        ? 'Параліч перед ухваленням рішень, страх помилитися, постійні сумніви.'
+        : 'Паралич перед принятием решений, страх ошибиться, постоянные сомнения.',
+      icon: GitBranch,
+      image: 'images/sad.jpeg'
+    },
+    {
+      id: 4,
+      title: uk ? 'Емоційне перевантаження' : 'Эмоциональная перегрузка',
+      description: uk
+        ? 'Коли емоцій занадто багато і не вдається ні зрозуміти їх, ні висловити.'
+        : 'Когда эмоций слишком много, и не получается ни понять их, ни выразить.',
+      icon: Zap,
+      image: 'images/konflikt.jpeg'
+    },
+    {
+      id: 5,
+      title: uk ? 'Порожнеча' : 'Пустота',
+      description: uk
+        ? 'Відчуття внутрішньої порожнечі, відсутність мотивації, нездатність радіти.'
+        : 'Ощущение внутренней пустоты, отсутствие мотивации, неспособность радоваться.',
+      icon: CircleDot,
+      image: 'images/body.jpeg'
+    }
+  ];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -78,13 +89,13 @@ const PsyStates = () => {
           className="text-center mb-16"
         >
           <p className="text-[#A3B18A] text-sm uppercase tracking-widest mb-4 font-medium">
-            С чем работаю
+            {uk ? 'З чим працюю' : 'С чем работаю'}
           </p>
           <h2 className="text-[#2B2B2B] text-2xl sm:text-3xl lg:text-4xl max-w-2xl mx-auto">
-            Узнаёте себя в каком-то из этих состояний?
+            {uk ? 'Впізнаєте себе в одному з цих станів?' : 'Узнаёте себя в каком-то из этих состояний?'}
           </h2>
           <p className="text-[#5A5A5A] mt-4 max-w-xl mx-auto">
-            Это распространённые переживания. Вы не одни — и есть путь через них.
+            {uk ? 'Це поширені переживання. Ви не самі — і є шлях пройти через них.' : 'Это распространённые переживания. Вы не одни — и есть путь через них.'}
           </p>
         </motion.div>
 

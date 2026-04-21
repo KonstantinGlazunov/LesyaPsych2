@@ -1,7 +1,9 @@
 import { motion } from 'framer-motion';
+import { isUk } from '../lib/lang';
 
 const PsyHero = () => {
   const baseUrl = import.meta.env.BASE_URL;
+  const uk = isUk();
 
   return (
     <section className="min-h-screen w-full flex items-center bg-[#F7F4F2] pt-20 pb-16 px-4 sm:px-6 lg:px-8 xl:px-12">
@@ -20,7 +22,7 @@ const PsyHero = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-[#A3B18A] text-sm uppercase tracking-widest mb-4 font-medium"
             >
-              Консультирующий психолог
+              {uk ? 'Російськомовний психолог у Німеччині, який також працює українською мовою' : 'Консультирующий психолог'}
             </motion.p>
             
             <motion.h1
@@ -29,7 +31,9 @@ const PsyHero = () => {
               transition={{ duration: 0.7, delay: 0.3 }}
               className="text-[#2B2B2B] text-3xl sm:text-4xl lg:text-5xl leading-tight mb-6"
             >
-              Когда внутри тревожно и непонятно — разбираемся вместе, что с вами происходит
+              {uk
+                ? 'Коли всередині тривожно і незрозуміло — разом розберемося, що з вами відбувається'
+                : 'Когда внутри тревожно и непонятно — разбираемся вместе, что с вами происходит'}
             </motion.h1>
             
             <motion.p
@@ -38,7 +42,9 @@ const PsyHero = () => {
               transition={{ duration: 0.6, delay: 0.5 }}
               className="text-[#5A5A5A] text-lg mb-8 max-w-lg"
             >
-              Помогаю разобраться в себе, снизить тревожность и восстановить внутреннюю опору
+              {uk
+                ? 'Допомагаю розібратися в собі, знизити тривожність і відновити внутрішню опору'
+                : 'Помогаю разобраться в себе, снизить тревожность и восстановить внутреннюю опору'}
             </motion.p>
             
           </motion.div>
@@ -59,7 +65,7 @@ const PsyHero = () => {
               >
                 <img
                   src={`${baseUrl}images/trust.jpeg`}
-                  alt="Леся Афанасьева — консультирующий психолог"
+                  alt={uk ? 'Леся Афанасьєва — психолог-консультант' : 'Леся Афанасьева — консультирующий психолог'}
                   className="w-full max-w-md lg:max-w-lg h-[28rem] sm:h-[32rem] object-cover object-[center_20%]"
                 />
               </motion.div>

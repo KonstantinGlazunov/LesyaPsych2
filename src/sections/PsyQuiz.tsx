@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '../components/ui/dialog';
 import { TELEGRAM_LINK, WHATSAPP_LINK } from '../lib/contact';
+import { isUk } from '../lib/lang';
 
 type QuizTag = 'anxiety' | 'support_loss' | 'exhaustion' | 'uncertainty' | 'mixed';
 
@@ -67,6 +68,65 @@ const quizQuestions = [
       { text: 'Больше внутреннего спокойствия', tag: 'anxiety' },
       { text: 'Почувствовать опору и устойчивость', tag: 'support_loss' },
       { text: 'Понять себя и свои следующие шаги', tag: 'uncertainty' },
+    ],
+  },
+];
+
+const quizQuestionsUk = [
+  {
+    title: 'Як ви найчастіше почуваєтеся останнім часом?',
+    options: [
+      { text: 'Наче всередині багато напруги, і я не можу розслабитися', tag: 'anxiety' },
+      { text: 'Наче тримаюся з останніх сил, і ресурсу майже не залишилося', tag: 'exhaustion' },
+      { text: 'Наче я не до кінця розумію, що зі мною відбувається і чого я хочу', tag: 'uncertainty' },
+    ],
+  },
+  {
+    title: 'Що зараз дається вам найважче?',
+    options: [
+      { text: 'Заспокоїтися і перестати прокручувати думки', tag: 'anxiety' },
+      { text: 'Опиратися на себе й відчувати стійкість', tag: 'support_loss' },
+      { text: 'Зрозуміти, у якому напрямку рухатися далі', tag: 'uncertainty' },
+    ],
+  },
+  {
+    title: 'Як ви зазвичай реагуєте на складні ситуації?',
+    options: [
+      { text: 'Починаю хвилюватися заздалегідь і думати про найгірше', tag: 'anxiety' },
+      { text: 'Гублюся і ніби не відчуваю опори під ногами', tag: 'support_loss' },
+      { text: 'Намагаюся впоратися, але потім відчуваю сильну внутрішню втому', tag: 'exhaustion' },
+    ],
+  },
+  {
+    title: 'Що найбільше схоже на ваш стан зараз?',
+    options: [
+      { text: 'Всередині занадто багато тривоги й напруги', tag: 'anxiety' },
+      { text: 'Мені важко зібратися, ніби я внутрішньо розсипався(лась)', tag: 'support_loss' },
+      { text: 'Ніби застряг(ла) між “вже не так” і “ще не розумію як”', tag: 'uncertainty' },
+    ],
+  },
+  {
+    title: 'Як у вас зараз із рішеннями?',
+    options: [
+      { text: 'Навіть прості рішення викликають зайві переживання', tag: 'anxiety' },
+      { text: 'Мені важко вирішувати, бо я не відчуваю впевненості всередині', tag: 'support_loss' },
+      { text: 'Мені складно вирішувати, бо я не до кінця розумію, чого хочу', tag: 'uncertainty' },
+    ],
+  },
+  {
+    title: 'Як ви почуваєтеся наприкінці дня?',
+    options: [
+      { text: 'Втомленим(ою), але думки все одно не відпускають', tag: 'anxiety' },
+      { text: 'Спустошеним(ою), ніби на себе зовсім не залишилося ресурсу', tag: 'exhaustion' },
+      { text: 'Із відчуттям, що день минув, а ясності так і не з’явилося', tag: 'uncertainty' },
+    ],
+  },
+  {
+    title: 'Що вам зараз потрібно найбільше?',
+    options: [
+      { text: 'Більше внутрішнього спокою', tag: 'anxiety' },
+      { text: 'Відчути опору і стійкість', tag: 'support_loss' },
+      { text: 'Зрозуміти себе і свої наступні кроки', tag: 'uncertainty' },
     ],
   },
 ];
@@ -135,6 +195,70 @@ const resultCopy: Record<QuizTag, {
   },
 };
 
+const resultCopyUk: Record<QuizTag, {
+  title: string;
+  short: string;
+  gentle: string;
+  support: string;
+  contact: string;
+}> = {
+  anxiety: {
+    title: 'Підвищена тривога',
+    short:
+      'Схоже, зараз усередині багато напруги, занепокоєння та спроб усе контролювати.',
+    gentle:
+      'Це не діагноз, а орієнтир, який допомагає уважніше подивитися на свій стан.',
+    support:
+      'Тривога часто посилюється у періоди невизначеності, перевантаження або внутрішнього конфлікту.',
+    contact:
+      'Якщо вам відгукується цей результат, напишіть мені — спокійно обговоримо вашу ситуацію.',
+  },
+  support_loss: {
+    title: 'Втрата внутрішньої опори',
+    short:
+      'Зараз може бути важко відчувати внутрішню стійкість і впевненість у собі.',
+    gentle:
+      'Це не діагноз, а м’яке позначення стану, у якому ви можете перебувати зараз.',
+    support:
+      'Такий стан часто виникає після складних стосунків, змін, криз або тривалої напруги.',
+    contact:
+      'Якщо відчуваєте, що зараз бракує опори, напишіть мені — разом визначимо, з чого почати.',
+  },
+  exhaustion: {
+    title: 'Емоційне виснаження',
+    short:
+      'Схоже, ви довго трималися й справлялися, тому внутрішній ресурс помітно знизився.',
+    gentle:
+      'Це не діагноз, а спосіб м’яко описати можливий поточний стан.',
+    support:
+      'Виснаження накопичується поступово, тому важливо дбати про себе без тиску та самокритики.',
+    contact:
+      'Якщо впізнаєте себе в цьому описі, напишіть мені — перша розмова вже може полегшити стан.',
+  },
+  uncertainty: {
+    title: 'Період внутрішньої невизначеності',
+    short:
+      'Можливо, ви у періоді, коли старі орієнтири вже не працюють, а нові ще не сформувалися.',
+    gentle:
+      'Це не діагноз, а орієнтир, який допомагає побачити, де саме потрібна підтримка.',
+    support:
+      'Такі періоди бувають у багатьох людей, особливо під час змін, криз і переїзду.',
+    contact:
+      'Якщо цей стан вам близький, напишіть мені — разом розберемо, що для вас зараз найважливіше.',
+  },
+  mixed: {
+    title: 'Поєднання станів',
+    short:
+      'Зараз у вас можуть поєднуватися кілька станів одночасно, і це нормально.',
+    gentle:
+      'Це не діагноз, а м’який орієнтир, щоб побачити різні сторони вашого самопочуття.',
+    support:
+      'Можна почати з того, що найбільше відгукується просто зараз, і рухатися крок за кроком.',
+    contact:
+      'Якщо хочете, напишіть мені — спокійно визначимо, з чого буде легше почати.',
+  },
+};
+
 const computeResultTag = (answers: QuizTag[]): QuizTag => {
   const counts = answers.reduce<Record<QuizTag, number>>((acc, tag) => {
     acc[tag] = (acc[tag] || 0) + 1;
@@ -169,13 +293,15 @@ type PsyQuizProps = {
 const PsyQuiz = ({ autoOpen }: PsyQuizProps) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const uk = isUk();
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<'intro' | 'quiz' | 'result'>('intro');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<QuizTag[]>([]);
   const [resultTag, setResultTag] = useState<QuizTag>('anxiety');
-
-  const currentQuestion = useMemo(() => quizQuestions[currentIndex], [currentIndex]);
+  const activeQuestions = useMemo(() => (uk ? quizQuestionsUk : quizQuestions), [uk]);
+  const activeResultCopy = useMemo(() => (uk ? resultCopyUk : resultCopy), [uk]);
+  const currentQuestion = useMemo(() => activeQuestions[currentIndex], [activeQuestions, currentIndex]);
 
   const resetQuiz = () => {
     setStep('intro');
@@ -207,7 +333,7 @@ const PsyQuiz = ({ autoOpen }: PsyQuizProps) => {
 
   const handleAnswer = (tag: QuizTag) => {
     const nextAnswers = [...answers, tag];
-    if (currentIndex >= quizQuestions.length - 1) {
+    if (currentIndex >= activeQuestions.length - 1) {
       setAnswers(nextAnswers);
       setResultTag(computeResultTag(nextAnswers));
       setStep('result');
@@ -247,17 +373,19 @@ const PsyQuiz = ({ autoOpen }: PsyQuizProps) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: 0.3 }}
-                className="text-white text-2xl sm:text-3xl mb-3"
+              className="text-white text-2xl sm:text-3xl mb-3"
               >
-                Не уверены, что с вами происходит?
+                {uk ? 'Не впевнені, що з вами відбувається?' : 'Не уверены, что с вами происходит?'}
               </motion.h3>
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: 0.4 }}
-                className="text-white/80 text-base sm:text-lg mb-6"
-              >
-                Пройдите короткую диагностику (2 минуты), чтобы лучше понять своё состояние
+              className="text-white/80 text-base sm:text-lg mb-6"
+            >
+                {uk
+                  ? 'Пройдіть коротку діагностику (2 хвилини), щоб краще зрозуміти свій стан'
+                  : 'Пройдите короткую диагностику (2 минуты), чтобы лучше понять своё состояние'}
               </motion.p>
               <motion.button
                 initial={{ opacity: 0, y: 20 }}
@@ -268,7 +396,7 @@ const PsyQuiz = ({ autoOpen }: PsyQuizProps) => {
                 onClick={() => setIsOpen(true)}
                 className="inline-flex items-center gap-2 bg-white text-[#2B2B2B] px-6 py-3.5 rounded-full font-medium btn-hover"
               >
-                Пройти тест
+                {uk ? 'Пройти тест' : 'Пройти тест'}
                 <ArrowRight className="w-5 h-5" />
               </motion.button>
             </div>
@@ -283,26 +411,30 @@ const PsyQuiz = ({ autoOpen }: PsyQuizProps) => {
               <div className="space-y-5">
                 <DialogHeader className="text-left">
                   <DialogTitle className="text-2xl sm:text-3xl text-[#2B2B2B]">
-                    Короткое описание теста
+                    {uk ? 'Короткий опис тесту' : 'Короткое описание теста'}
                   </DialogTitle>
                 </DialogHeader>
                 <p className="text-[#4B4B4B] text-sm sm:text-base leading-relaxed">
-                  Этот тест поможет вам внимательнее посмотреть на свое текущее состояние и заметить,
-                  что сейчас требует поддержки и внимания.
+                  {uk
+                    ? 'Цей тест допоможе уважніше подивитися на ваш поточний стан і помітити, що зараз потребує підтримки та уваги.'
+                    : 'Этот тест поможет вам внимательнее посмотреть на свое текущее состояние и заметить, что сейчас требует поддержки и внимания.'}
                 </p>
                 <p className="text-[#4B4B4B] text-sm sm:text-base leading-relaxed">
-                  Он не ставит диагнозов, а дает ориентир, с чем может быть связано ваше внутреннее
-                  напряжение или неясность.
+                  {uk
+                    ? 'Він не ставить діагнозів, а дає орієнтир, з чим може бути пов’язана ваша внутрішня напруга або неясність.'
+                    : 'Он не ставит диагнозов, а дает ориентир, с чем может быть связано ваше внутреннее напряжение или неясность.'}
                 </p>
                 <p className="text-[#4B4B4B] text-sm sm:text-base leading-relaxed">
-                  Долго не думайте, выбирайте ближайший к вам вариант ответа.
+                  {uk
+                    ? 'Довго не думайте, обирайте варіант відповіді, що найбільше відгукується.'
+                    : 'Долго не думайте, выбирайте ближайший к вам вариант ответа.'}
                 </p>
                 <div>
                   <button
                     onClick={handleStart}
                     className="inline-flex items-center gap-2 bg-[#2B2B2B] text-white px-6 py-3 rounded-full font-medium hover:bg-[#1F1F1F] transition-colors"
                   >
-                    Начнем!
+                    {uk ? 'Почнімо!' : 'Начнем!'}
                     <ArrowRight className="w-5 h-5" />
                   </button>
                 </div>
@@ -312,7 +444,7 @@ const PsyQuiz = ({ autoOpen }: PsyQuizProps) => {
             {step === 'quiz' && currentQuestion && (
               <div className="space-y-5">
                 <div className="text-sm text-[#7A6B63]">
-                  Вопрос {currentIndex + 1} из {quizQuestions.length}
+                  {uk ? 'Питання' : 'Вопрос'} {currentIndex + 1} {uk ? 'з' : 'из'} {activeQuestions.length}
                 </div>
                 <h3 className="text-xl sm:text-2xl text-[#2B2B2B] font-medium">
                   {currentQuestion.title}
@@ -333,20 +465,20 @@ const PsyQuiz = ({ autoOpen }: PsyQuizProps) => {
 
             {step === 'result' && (
               <div className="space-y-5">
-                <div className="text-sm text-[#7A6B63]">Ваш результат</div>
+                <div className="text-sm text-[#7A6B63]">{uk ? 'Ваш результат' : 'Ваш результат'}</div>
                 <h3 className="text-xl sm:text-2xl text-[#2B2B2B] font-semibold">
-                  {resultCopy[resultTag].title}
+                  {activeResultCopy[resultTag].title}
                 </h3>
                 <div className="max-h-[55vh] overflow-y-auto pr-1 space-y-4 text-[#4B4B4B] text-sm sm:text-base leading-relaxed">
-                  <p>{resultCopy[resultTag].short}</p>
-                  <p>{resultCopy[resultTag].gentle}</p>
-                  <p>{resultCopy[resultTag].support}</p>
-                  <p>{resultCopy[resultTag].contact}</p>
+                  <p>{activeResultCopy[resultTag].short}</p>
+                  <p>{activeResultCopy[resultTag].gentle}</p>
+                  <p>{activeResultCopy[resultTag].support}</p>
+                  <p>{activeResultCopy[resultTag].contact}</p>
                 </div>
 
                 <div className="space-y-3 text-center">
                   <div className="text-sm sm:text-base font-medium text-[#2B2B2B]">
-                    Написать или отправить голосовое сообщение
+                    {uk ? 'Написати або надіслати голосове повідомлення' : 'Написать или отправить голосовое сообщение'}
                   </div>
                   <div className="flex flex-row flex-wrap gap-3 justify-center">
                     <a

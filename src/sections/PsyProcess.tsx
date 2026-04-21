@@ -2,37 +2,46 @@ import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { MessageSquare, Users, FileCheck, CalendarCheck } from 'lucide-react';
-
-const steps = [
-  {
-    number: '01',
-    icon: MessageSquare,
-    title: 'Напишите',
-    description: 'Напишите или отправьте голосовое сообщение мне в WhatsApp или Telegram. Расскажите коротко, что привело вас к психологу.'
-  },
-  {
-    number: '02',
-    icon: Users,
-    title: 'Поговорим',
-    description: 'Мы коротко пообщаемся, чтобы понять ваш запрос и подходит ли вам мой подход.'
-  },
-  {
-    number: '03',
-    icon: FileCheck,
-    title: 'Договоримся',
-    description: 'Обсудим формат, частоту и удобное время для встреч — онлайн или офлайн.'
-  },
-  {
-    number: '04',
-    icon: CalendarCheck,
-    title: 'Начнём работу',
-    description: 'Начинаем с первой консультации. Начинаем там, где вы сейчас находитесь.'
-  }
-];
+import { isUk } from '../lib/lang';
 
 const PsyProcess = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const uk = isUk();
+  const steps = [
+    {
+      number: '01',
+      icon: MessageSquare,
+      title: uk ? 'Напишіть' : 'Напишите',
+      description: uk
+        ? 'Напишіть або надішліть голосове повідомлення у WhatsApp чи Telegram. Коротко розкажіть, що привело вас до психолога.'
+        : 'Напишите или отправьте голосовое сообщение мне в WhatsApp или Telegram. Расскажите коротко, что привело вас к психологу.'
+    },
+    {
+      number: '02',
+      icon: Users,
+      title: uk ? 'Поговоримо' : 'Поговорим',
+      description: uk
+        ? 'Коротко поспілкуємося, щоб зрозуміти ваш запит і чи підходить вам мій підхід.'
+        : 'Мы коротко пообщаемся, чтобы понять ваш запрос и подходит ли вам мой подход.'
+    },
+    {
+      number: '03',
+      icon: FileCheck,
+      title: uk ? 'Домовимося' : 'Договоримся',
+      description: uk
+        ? 'Обговоримо формат, частоту та зручний час для зустрічей — онлайн або офлайн.'
+        : 'Обсудим формат, частоту и удобное время для встреч — онлайн или офлайн.'
+    },
+    {
+      number: '04',
+      icon: CalendarCheck,
+      title: uk ? 'Почнемо роботу' : 'Начнём работу',
+      description: uk
+        ? 'Починаємо з першої консультації. Стартуємо з тієї точки, де ви зараз є.'
+        : 'Начинаем с первой консультации. Начинаем там, где вы сейчас находитесь.'
+    }
+  ];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -66,13 +75,13 @@ const PsyProcess = () => {
           className="text-center mb-16"
         >
           <p className="text-[#A3B18A] text-sm uppercase tracking-widest mb-4 font-medium">
-            Как это работает
+            {uk ? 'Як це працює' : 'Как это работает'}
           </p>
           <h2 className="text-[#2B2B2B] text-2xl sm:text-3xl lg:text-4xl max-w-2xl mx-auto">
-            Простые шаги, чтобы начать
+            {uk ? 'Прості кроки, щоб почати' : 'Простые шаги, чтобы начать'}
           </h2>
           <p className="text-[#5A5A5A] mt-4 max-w-xl mx-auto">
-            Начать легко. Вот как выглядит процесс.
+            {uk ? 'Почати легко. Ось як виглядає процес.' : 'Начать легко. Вот как выглядит процесс.'}
           </p>
         </motion.div>
 

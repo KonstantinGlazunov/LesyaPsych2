@@ -1,11 +1,13 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
+import { isUk } from '../lib/lang';
 
 const PsyVideo = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const baseUrl = import.meta.env.BASE_URL;
+  const uk = isUk();
 
   return (
     <section ref={ref} className="w-full py-20 lg:py-28 bg-[#FAF8F6] px-4 sm:px-6 lg:px-8 xl:px-12">
@@ -17,10 +19,10 @@ const PsyVideo = () => {
           className="text-center mb-12"
  >
           <p className="text-[#A3B18A] text-sm uppercase tracking-widest mb-4 font-medium">
-            Знакомство
+            {uk ? 'Знайомство' : 'Знакомство'}
           </p>
           <h2 className="text-[#2B2B2B] text-2xl sm:text-3xl lg:text-4xl max-w-2xl mx-auto">
-            Коротко о том, чем я могу быть полезна
+            {uk ? 'Коротко про те, чим я можу бути корисною' : 'Коротко о том, чем я могу быть полезна'}
           </h2>
         </motion.div>
 
@@ -38,7 +40,7 @@ const PsyVideo = () => {
               poster={`${baseUrl}images/trust.jpeg`}
             >
               <source src={`${baseUrl}images/presentation.mp4`} type="video/mp4" />
-              Ваш браузер не поддерживает воспроизведение видео.
+              {uk ? 'Ваш браузер не підтримує відтворення відео.' : 'Ваш браузер не поддерживает воспроизведение видео.'}
             </video>
           </div>
         </motion.div>

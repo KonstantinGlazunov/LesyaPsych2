@@ -16,6 +16,7 @@ import type { LegalPageKey } from './lib/contact';
 import BlogPage from './sections/BlogPage';
 import { getPostBySlug } from './lib/blog';
 import BlogAdmin from './sections/BlogAdmin';
+import { getSiteLang } from './lib/lang';
 
 const getLegalPageFromUrl = (): LegalPageKey | null => {
   const page = new URLSearchParams(window.location.search).get('page');
@@ -30,6 +31,7 @@ const getLegalPageFromUrl = (): LegalPageKey | null => {
 function App() {
   const legalPage = useMemo(() => getLegalPageFromUrl(), []);
   const blogParams = useMemo(() => new URLSearchParams(window.location.search), []);
+  const siteLang = useMemo(() => getSiteLang(), []);
   const isBlogPage = blogParams.get('page') === 'blog';
   const isAdminPage = blogParams.get('page') === 'admin';
   const shouldOpenQuiz = blogParams.get('quiz') === '1';
@@ -37,7 +39,7 @@ function App() {
 
   useEffect(() => {
     const isLegal = Boolean(legalPage);
-    document.documentElement.lang = isLegal ? 'de' : 'ru';
+    document.documentElement.lang = isLegal ? 'de' : siteLang;
 
     if (isLegal) {
       document.title = `${legalPage === 'agb' ? 'AGB' : legalPage === 'datenschutz' ? 'Datenschutzerklärung' : 'Impressum'} | Леся Афанасьева`;
@@ -56,7 +58,31 @@ function App() {
     }
 
     document.title = 'Леся Афанасьева';
-  }, [legalPage, isBlogPage, blogSlug]);
+  }, [legalPage, isBlogPage, blogSlug, siteLang]);
+
+  useEffect(() => {
+    if (legalPage || isBlogPage || isAdminPage) {
+      return;
+    }
+
+    const scrollToHash = () => {
+      const hash = window.location.hash;
+      if (!hash) return;
+
+      const element = document.querySelector(hash);
+      if (!element) return;
+
+      element.scrollIntoView({ behavior: 'auto', block: 'start' });
+    };
+
+    const timeoutId = window.setTimeout(scrollToHash, 0);
+    window.addEventListener('hashchange', scrollToHash);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      window.removeEventListener('hashchange', scrollToHash);
+    };
+  }, [legalPage, isBlogPage, isAdminPage]);
 
   if (legalPage) {
     return (

@@ -2,40 +2,41 @@ import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { X, ArrowRight, Check } from 'lucide-react';
-
-const transformations = [
-  {
-    id: 1,
-    before: 'Постоянная тревога и беспокойство',
-    after: 'Внутреннее спокойствие и ясность',
-    image: 'images/image_b87f5b.jpg',
-    imageClass: 'object-[center_20%] scale-110',
-    imageHoverClass: 'group-hover:scale-[1.15]'
-  },
-  {
-    id: 2,
-    before: 'Ощущение потери себя и растерянность',
-    after: 'Ощущение целостности и направления',
-    image: 'images/relax.jpeg'
-  },
-  {
-    id: 3,
-    before: 'Переполненность эмоциями',
-    after: 'Эмоциональная устойчивость и баланс',
-    image: 'images/konflikt.jpeg'
-  },
-  {
-    id: 4,
-    before: 'Сложности с принятием решений',
-    after: 'Уверенность в своих выборах',
-    image: 'images/doit.jpeg'
-  }
-];
+import { isUk } from '../lib/lang';
 
 const PsyHelp = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const baseUrl = import.meta.env.BASE_URL;
+  const uk = isUk();
+  const transformations = [
+    {
+      id: 1,
+      before: uk ? 'Постійна тривога й занепокоєння' : 'Постоянная тревога и беспокойство',
+      after: uk ? 'Внутрішній спокій і ясність' : 'Внутреннее спокойствие и ясность',
+      image: 'images/image_b87f5b.jpg',
+      imageClass: 'object-[center_20%] scale-110',
+      imageHoverClass: 'group-hover:scale-[1.15]'
+    },
+    {
+      id: 2,
+      before: uk ? 'Відчуття втрати себе й розгубленість' : 'Ощущение потери себя и растерянность',
+      after: uk ? 'Відчуття цілісності й напрямку' : 'Ощущение целостности и направления',
+      image: 'images/relax.jpeg'
+    },
+    {
+      id: 3,
+      before: uk ? 'Емоційне переповнення' : 'Переполненность эмоциями',
+      after: uk ? 'Емоційна стійкість і баланс' : 'Эмоциональная устойчивость и баланс',
+      image: 'images/konflikt.jpeg'
+    },
+    {
+      id: 4,
+      before: uk ? 'Складнощі з прийняттям рішень' : 'Сложности с принятием решений',
+      after: uk ? 'Впевненість у своїх виборах' : 'Уверенность в своих выборах',
+      image: 'images/doit.jpeg'
+    }
+  ];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -69,13 +70,13 @@ const PsyHelp = () => {
           className="text-center mb-16"
         >
           <p className="text-[#A3B18A] text-sm uppercase tracking-widest mb-4 font-medium">
-            Результат работы
+            {uk ? 'Результат роботи' : 'Результат работы'}
           </p>
           <h2 className="text-[#2B2B2B] text-2xl sm:text-3xl lg:text-4xl max-w-2xl mx-auto">
-            Что меняется в процессе нашей работы
+            {uk ? 'Що змінюється у процесі нашої роботи' : 'Что меняется в процессе нашей работы'}
           </h2>
           <p className="text-[#5A5A5A] mt-4 max-w-xl mx-auto">
-            Терапия — это путь трансформации. Вот к чему мы можем прийти вместе.
+            {uk ? 'Терапія — це шлях трансформації. Ось до чого ми можемо прийти разом.' : 'Терапия — это путь трансформации. Вот к чему мы можем прийти вместе.'}
           </p>
         </motion.div>
 
@@ -105,7 +106,7 @@ const PsyHelp = () => {
                 <div className="p-6 sm:p-8 flex flex-col justify-center">
                   {/* Before */}
                   <div className="mb-4">
-                    <p className="text-[#5A5A5A] text-xs uppercase tracking-wider mb-2">Было</p>
+                    <p className="text-[#5A5A5A] text-xs uppercase tracking-wider mb-2">{uk ? 'Було' : 'Было'}</p>
                     <div className="flex items-start gap-2">
                       <X className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
                       <p className="text-[#2B2B2B] text-sm">{item.before}</p>
@@ -119,7 +120,7 @@ const PsyHelp = () => {
                   
                   {/* After */}
                   <div>
-                    <p className="text-[#A3B18A] text-xs uppercase tracking-wider mb-2">Станет</p>
+                    <p className="text-[#A3B18A] text-xs uppercase tracking-wider mb-2">{uk ? 'Стане' : 'Станет'}</p>
                     <div className="flex items-start gap-2">
                       <Check className="w-5 h-5 text-[#A3B18A] flex-shrink-0 mt-0.5" />
                       <p className="text-[#2B2B2B] font-medium text-sm">{item.after}</p>

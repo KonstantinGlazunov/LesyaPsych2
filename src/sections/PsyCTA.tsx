@@ -3,10 +3,12 @@ import { useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { Heart } from 'lucide-react';
 import { TELEGRAM_LINK, WHATSAPP_LINK } from '../lib/contact';
+import { isUk } from '../lib/lang';
 
 const PsyCTA = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const uk = isUk();
 
   return (
     <section ref={ref} className="w-full py-20 lg:py-28 bg-[#F7F4F2] px-4 sm:px-6 lg:px-8 xl:px-12">
@@ -38,7 +40,7 @@ const PsyCTA = () => {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="text-white text-2xl sm:text-3xl lg:text-4xl mb-4 max-w-2xl mx-auto"
             >
-              Если мой подход откликается — пишите мне
+              {uk ? 'Якщо мій підхід вам відгукується — напишіть мені' : 'Если мой подход откликается — пишите мне'}
             </motion.h2>
             
             <motion.p
@@ -47,9 +49,11 @@ const PsyCTA = () => {
               transition={{ duration: 0.6, delay: 0.4 }}
               className="text-white/80 text-base sm:text-lg mb-8 max-w-lg mx-auto"
             >
-              Мы спокойно обсудим вашу ситуацию и найдём лучший путь вперёд вместе.
+              {uk
+                ? 'Ми спокійно обговоримо вашу ситуацію і разом знайдемо найкращий шлях уперед.'
+                : 'Мы спокойно обсудим вашу ситуацию и найдём лучший путь вперёд вместе.'}
               <span className="block mt-2 text-white font-medium">
-                Первая консультация — бесплатно.
+                {uk ? 'Перша консультація — безкоштовно.' : 'Первая консультация — бесплатно.'}
               </span>
             </motion.p>
             
@@ -60,7 +64,7 @@ const PsyCTA = () => {
               className="space-y-3"
             >
               <div className="text-sm sm:text-base font-medium text-white">
-                Написать или отправить голосовое сообщение
+                {uk ? 'Написати або надіслати голосове повідомлення' : 'Написать или отправить голосовое сообщение'}
               </div>
               <div className="flex flex-row flex-wrap gap-3 justify-center">
                 <a
@@ -103,8 +107,9 @@ const PsyCTA = () => {
               transition={{ duration: 0.5, delay: 0.6 }}
               className="mt-5 text-sm text-white/75"
             >
-              Mit Klick auf WhatsApp verlassen Sie diese Website. Es gelten dann die
-              Datenschutzbestimmungen des externen Anbieters.
+              {uk
+                ? 'Натискаючи на WhatsApp, ви залишаєте цей сайт. Далі діють правила конфіденційності зовнішнього сервісу.'
+                : 'Mit Klick auf WhatsApp verlassen Sie diese Website. Es gelten dann die Datenschutzbestimmungen des externen Anbieters.'}
             </motion.p>
           </div>
         </motion.div>
