@@ -64,8 +64,13 @@ const PsyHero = () => {
                 className="relative overflow-hidden rounded-[1.5rem] shadow-softer"
               >
                 <img
-                  src={`${baseUrl}images/trust.jpeg`}
+                  src={`${baseUrl}images/trust-1024.webp`}
                   alt={uk ? 'Леся Афанасьєва — психолог-консультант' : 'Леся Афанасьева — консультирующий психолог'}
+                  width="1024"
+                  height="682"
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
                   className="w-full max-w-md lg:max-w-lg h-[28rem] sm:h-[32rem] object-cover object-[center_20%]"
                 />
               </motion.div>

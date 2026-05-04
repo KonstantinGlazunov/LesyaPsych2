@@ -123,8 +123,12 @@ const PsyMigration = () => {
               className="relative overflow-hidden rounded-[1.5rem] shadow-softer"
             >
               <img
-                src={`${baseUrl}images/kolage.jpeg`}
+                src={`${baseUrl}images/kolage-900.webp`}
                 alt="Баланс и гармония"
+                width="900"
+                height="1126"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-auto object-cover"
               />
             </motion.div>

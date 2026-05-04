@@ -14,7 +14,9 @@ const PsyHelp = () => {
       id: 1,
       before: uk ? 'Постійна тривога й занепокоєння' : 'Постоянная тревога и беспокойство',
       after: uk ? 'Внутрішній спокій і ясність' : 'Внутреннее спокойствие и ясность',
-      image: 'images/image_b87f5b.jpg',
+      image: 'images/image_b87f5b-530.webp',
+      imageWidth: 530,
+      imageHeight: 1036,
       imageClass: 'object-[center_20%] scale-110',
       imageHoverClass: 'group-hover:scale-[1.15]'
     },
@@ -22,19 +24,25 @@ const PsyHelp = () => {
       id: 2,
       before: uk ? 'Відчуття втрати себе й розгубленість' : 'Ощущение потери себя и растерянность',
       after: uk ? 'Відчуття цілісності й напрямку' : 'Ощущение целостности и направления',
-      image: 'images/relax.jpeg'
+      image: 'images/relax-760.webp',
+      imageWidth: 760,
+      imageHeight: 1140
     },
     {
       id: 3,
       before: uk ? 'Емоційне переповнення' : 'Переполненность эмоциями',
       after: uk ? 'Емоційна стійкість і баланс' : 'Эмоциональная устойчивость и баланс',
-      image: 'images/konflikt.jpeg'
+      image: 'images/konflikt-760.webp',
+      imageWidth: 760,
+      imageHeight: 506
     },
     {
       id: 4,
       before: uk ? 'Складнощі з прийняттям рішень' : 'Сложности с принятием решений',
       after: uk ? 'Впевненість у своїх виборах' : 'Уверенность в своих выборах',
-      image: 'images/doit.jpeg'
+      image: 'images/doit-760.webp',
+      imageWidth: 760,
+      imageHeight: 506
     }
   ];
 
@@ -98,6 +106,10 @@ const PsyHelp = () => {
                   <img
                     src={`${baseUrl}${item.image}`}
                     alt={item.after}
+                    width={item.imageWidth}
+                    height={item.imageHeight}
+                    loading="lazy"
+                    decoding="async"
                     className={`w-full h-full object-cover transition-transform duration-500 ${item.imageHoverClass ?? 'group-hover:scale-105'} ${item.imageClass ?? ''}`}
                   />
                 </div>

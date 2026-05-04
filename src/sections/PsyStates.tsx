@@ -17,7 +17,9 @@ const PsyStates = () => {
         ? 'Постійне занепокоєння, внутрішнє напруження, відчуття, що все виходить з-під контролю.'
         : 'Постоянное беспокойство, внутреннее напряжение, ощущение, что всё выходит из-под контроля.',
       icon: Brain,
-      image: 'images/window.jpeg'
+      image: 'images/window-760.webp',
+      imageWidth: 760,
+      imageHeight: 506
     },
     {
       id: 2,
@@ -26,7 +28,9 @@ const PsyStates = () => {
         ? 'Відчуття відірваності від себе справжнього, своїх цінностей і сенсів.'
         : 'Ощущение оторванности от себя настоящего, своих ценностей и смыслов.',
       icon: UserX,
-      image: 'images/window2.jpeg'
+      image: 'images/window2-760.webp',
+      imageWidth: 760,
+      imageHeight: 516
     },
     {
       id: 3,
@@ -35,7 +39,9 @@ const PsyStates = () => {
         ? 'Параліч перед ухваленням рішень, страх помилитися, постійні сумніви.'
         : 'Паралич перед принятием решений, страх ошибиться, постоянные сомнения.',
       icon: GitBranch,
-      image: 'images/sad.jpeg'
+      image: 'images/sad-760.webp',
+      imageWidth: 760,
+      imageHeight: 506
     },
     {
       id: 4,
@@ -44,7 +50,9 @@ const PsyStates = () => {
         ? 'Коли емоцій занадто багато і не вдається ні зрозуміти їх, ні висловити.'
         : 'Когда эмоций слишком много, и не получается ни понять их, ни выразить.',
       icon: Zap,
-      image: 'images/konflikt.jpeg'
+      image: 'images/konflikt-760.webp',
+      imageWidth: 760,
+      imageHeight: 506
     },
     {
       id: 5,
@@ -53,7 +61,9 @@ const PsyStates = () => {
         ? 'Відчуття внутрішньої порожнечі, відсутність мотивації, нездатність радіти.'
         : 'Ощущение внутренней пустоты, отсутствие мотивации, неспособность радоваться.',
       icon: CircleDot,
-      image: 'images/body.jpeg'
+      image: 'images/body-760.webp',
+      imageWidth: 760,
+      imageHeight: 508
     }
   ];
 
@@ -118,6 +128,10 @@ const PsyStates = () => {
                   <img
                     src={`${baseUrl}${state.image}`}
                     alt={state.title}
+                    width={state.imageWidth}
+                    height={state.imageHeight}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>

@@ -36,10 +36,10 @@ const PsyVideo = () => {
             <video
               className="absolute inset-0 h-full w-full object-cover"
               controls
-              preload="metadata"
-              poster={`${baseUrl}images/trust.jpeg`}
+              preload="none"
+              poster={`${baseUrl}images/trust-1024.webp`}
             >
-              <source src={`${baseUrl}images/presentation.mp4`} type="video/mp4" />
+              <source src={`${baseUrl}images/presentation-optimized.mp4`} type="video/mp4" />
               {uk ? 'Ваш браузер не підтримує відтворення відео.' : 'Ваш браузер не поддерживает воспроизведение видео.'}
             </video>
           </div>

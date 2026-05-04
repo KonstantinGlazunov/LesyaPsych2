@@ -78,8 +78,11 @@ const PsyNavigation = () => {
               className="inline-flex items-center gap-3 text-[#2B2B2B] font-serif text-lg lg:text-xl leading-tight"
             >
               <img
-                src={`${baseUrl}images/lesyLogo.png`}
+                src={`${baseUrl}images/lesyLogo-80.png`}
                 alt="Логотип Леси Афанасьевой"
+                width="80"
+                height="80"
+                decoding="async"
                 className="h-10 w-auto"
               />
               <span>Леся Афанасьева</span>

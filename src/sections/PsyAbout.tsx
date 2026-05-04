@@ -35,8 +35,12 @@ const PsyAbout = () => {
               className="relative overflow-hidden rounded-[1.5rem] shadow-softer"
             >
               <img
-                src={`${baseUrl}images/understanding.jpeg`}
+                src={`${baseUrl}images/understanding-760.webp`}
                 alt="Леся Афанасьева на консультации"
+                width="760"
+                height="1140"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-auto object-cover"
               />
             </motion.div>
