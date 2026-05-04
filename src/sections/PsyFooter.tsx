@@ -120,6 +120,12 @@ const PsyFooter = () => {
               >
                 {uk ? "Зв'язатися" : 'Связаться'}
               </a>
+              <a
+                href={uk ? `${homeHref}?lang=uk&page=blog` : `${homeHref}?page=blog`}
+                className="block text-white/80 hover:text-white transition-colors text-sm"
+              >
+                {uk ? 'Блог' : 'Блог'}
+              </a>
               <a href={getLegalHref('impressum')} className="block text-white/80 hover:text-white transition-colors text-sm">
                 Impressum
               </a>

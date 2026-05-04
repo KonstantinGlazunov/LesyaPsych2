@@ -18,6 +18,54 @@ import { getPostBySlug } from './lib/blog';
 import BlogAdmin from './sections/BlogAdmin';
 import { getSiteLang } from './lib/lang';
 
+const SITE_URL = 'https://psycholog-ua-ru.de';
+
+const upsertMeta = (selector: string, attribute: 'name' | 'property', value: string, content: string) => {
+  let element = document.head.querySelector(selector) as HTMLMetaElement | null;
+  if (!element) {
+    element = document.createElement('meta');
+    element.setAttribute(attribute, value);
+    document.head.appendChild(element);
+  }
+  element.setAttribute('content', content);
+};
+
+const upsertLink = (selector: string, rel: string, href: string, hreflang?: string) => {
+  let element = document.head.querySelector(selector) as HTMLLinkElement | null;
+  if (!element) {
+    element = document.createElement('link');
+    element.setAttribute('rel', rel);
+    document.head.appendChild(element);
+  }
+  element.setAttribute('href', href);
+  if (hreflang) {
+    element.setAttribute('hreflang', hreflang);
+  }
+};
+
+const buildCanonical = () => {
+  const params = new URLSearchParams(window.location.search);
+  const normalized = new URLSearchParams();
+  const page = params.get('page');
+  const lang = params.get('lang');
+  const post = params.get('post');
+
+  if (lang === 'uk') {
+    normalized.set('lang', 'uk');
+  }
+  if (page === 'blog') {
+    normalized.set('page', 'blog');
+    if (post) {
+      normalized.set('post', post);
+    }
+  } else if (page === 'impressum' || page === 'datenschutz' || page === 'agb') {
+    normalized.set('page', page);
+  }
+
+  const query = normalized.toString();
+  return `${SITE_URL}/${query ? `?${query}` : ''}`;
+};
+
 const getLegalPageFromUrl = (): LegalPageKey | null => {
   const page = new URLSearchParams(window.location.search).get('page');
 
@@ -38,6 +86,22 @@ function App() {
   const blogSlug = blogParams.get('post');
 
   useEffect(() => {
+    const canonical = buildCanonical();
+    const ruHref = `${SITE_URL}/`;
+    const ukHref = `${SITE_URL}/?lang=uk`;
+
+    upsertLink('link[rel="canonical"]', 'canonical', canonical);
+    upsertLink('link[rel="alternate"][hreflang="ru"]', 'alternate', ruHref, 'ru');
+    upsertLink('link[rel="alternate"][hreflang="uk"]', 'alternate', ukHref, 'uk');
+    upsertLink('link[rel="alternate"][hreflang="x-default"]', 'alternate', ruHref, 'x-default');
+    upsertMeta('meta[property="og:url"]', 'property', 'og:url', canonical);
+    upsertMeta(
+      'meta[name="robots"]',
+      'name',
+      'robots',
+      isAdminPage ? 'noindex,nofollow,noarchive' : 'index,follow'
+    );
+
     const isLegal = Boolean(legalPage);
     document.documentElement.lang = isLegal ? 'de' : siteLang;
 
@@ -58,7 +122,7 @@ function App() {
     }
 
     document.title = 'Леся Афанасьева';
-  }, [legalPage, isBlogPage, blogSlug, siteLang]);
+  }, [legalPage, isBlogPage, blogSlug, siteLang, isAdminPage]);
 
   useEffect(() => {
     if (legalPage || isBlogPage || isAdminPage) {
